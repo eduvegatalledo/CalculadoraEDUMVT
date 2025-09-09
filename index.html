@@ -37,28 +37,18 @@
   </header>
 
   <!-- HERO: izquierda título, derecha acceso -->
-  <section id="hero-guest" class="hero" aria-labelledby="heroGuestTitle">
-    <div class="wrap hero-pad">
-      <div class="hero-grid">
-        <!-- Columna izquierda: título -->
-        <div>
-          <h1 id="heroGuestTitle" class="display">Nutrición simple, progreso real</h1>
-          <p class="subbrand">ProteeMVT</p>
-          <p class="lead">Calcula tus macros, registra lo que comes y mide tu avance.</p>
-        </div>
-
-        <!-- Columna derecha: acceso -->
-        <aside class="card access-card" aria-labelledby="accessTitle">
-          <h2 id="accessTitle">Acceso</h2>
-          <p class="muted">Elige una opción para continuar.</p>
-          <div class="stack-10">
-            <button id="btnOpenSignup" class="btn btn-primary" type="button">Regístrate aquí</button>
-            <button id="btnOpenLogin" class="btn btn-soft" type="button">Iniciar sesión</button>
-          </div>
-        </aside>
+  <section id="hero-guest" class="hero" aria-labelledby="accessTitle">
+  <div class="wrap hero-pad" style="display:grid;place-items:center;min-height:60vh">
+    <aside class="card access-card" aria-labelledby="accessTitle" style="max-width:480px;width:100%">
+      <h2 id="accessTitle" style="margin-top:0;text-align:center">Acceso</h2>
+      <p class="muted" style="text-align:center">Inicia sesión o crea tu cuenta</p>
+      <div class="stack-10" style="margin-top:10px">
+        <button id="btnOpenLogin" class="btn btn-primary" type="button">Iniciar sesión</button>
+        <button id="btnOpenSignup" class="btn btn-soft" type="button">Regístrate</button>
       </div>
-    </div>
-  </section>
+    </aside>
+  </div>
+</section>
 
   <!-- DASHBOARD (se muestra después de iniciar sesión) -->
  <main class="wrap hide" id="main">
