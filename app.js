@@ -19,6 +19,147 @@ function showSection(sec){ ["resumen","comidas","progreso"].forEach(id=>$(id).cl
 function openModal(id){ show(id); document.body.style.overflow='hidden'; }
 function closeModal(id){ hide(id); document.body.style.overflow=''; }
 
+// ---------- Utils de fecha ----------
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+// ---------- Metas (goals) ----------
+async function loadGoal() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return null;
+  const { data, error } = await sb.from('goals').select('*').eq('user_id', user.id).maybeSingle();
+  if (error) { console.error(error); return null; }
+  return data || null;
+}
+
+async function saveGoal() {
+  const msg = $('goalMsg'); msg.textContent = '';
+  const kcal  = Number($('inGoalKcal').value||0);
+  const prot  = Number($('inGoalProt').value||0);
+  const carb  = Number($('inGoalCarb').value||0);
+  const fat   = Number($('inGoalFat').value||0);
+  if (kcal<=0 || prot<0 || carb<0 || fat<0) { msg.textContent='Revisa los valores.'; return; }
+
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { msg.textContent='Inicia sesión.'; return; }
+
+  const { error } = await sb.from('goals').upsert({
+    user_id: user.id, kcal_target: kcal,
+    protein_g_target: prot, carbs_g_target: carb, fat_g_target: fat
+  });
+  msg.textContent = error ? ('Error: '+error.message) : 'Metas guardadas ✅';
+  await loadToday(); // refresca resumen
+}
+$('btnSaveGoal').onclick = saveGoal;
+
+// ---------- Comidas (meals) ----------
+async function addMeal() {
+  const msg = $('mealMsg'); msg.textContent = '';
+  const name = ($('mealName').value||'').trim();
+  const qty = Number($('mealQty').value||0);
+  const per = {
+    kcal: Number($('perKcal').value||0),
+    protein_g: Number($('perProt').value||0),
+    carbs_g: Number($('perCarb').value||0),
+    fat_g: Number($('perFat').value||0),
+  };
+  if (!name || qty<=0 || per.kcal<0) { msg.textContent='Completa nombre, cantidad y kcal.'; return; }
+
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { msg.textContent='Inicia sesión.'; return; }
+
+  const payload = {
+    user_id: user.id,
+    eaten_at: todayStr(),
+    food_name: name,
+    qty,
+    kcal: per.kcal * qty,
+    protein_g: per.protein_g * qty,
+    carbs_g: per.carbs_g * qty,
+    fat_g: per.fat_g * qty,
+  };
+
+  const { error } = await sb.from('meals').insert(payload);
+  if (error) { msg.textContent = 'Error: '+error.message; return; }
+
+  msg.textContent = 'Agregado ✅';
+  $('mealName').value=''; $('mealQty').value='1';
+  ['perKcal','perProt','perCarb','perFat'].forEach(id=>$(id).value='');
+  await loadToday();
+  await loadMealsToday();
+}
+$('btnAddMeal').onclick = addMeal;
+
+// ---------- Listado & resumen del día ----------
+async function loadMealsToday() {
+  const list = $('mealList'); list.innerHTML = '';
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+
+  const { data, error } = await sb
+    .from('meals')
+    .select('id, food_name, qty, kcal, protein_g, carbs_g, fat_g')
+    .eq('user_id', user.id)
+    .eq('eaten_at', todayStr())
+    .order('id', { ascending: false });
+
+  if (error) { list.innerHTML = `<p class="muted">Error: ${error.message}</p>`; return; }
+  if (!data?.length) { list.innerHTML = `<p class="muted">Aún no registras comidas hoy.</p>`; return; }
+
+  data.forEach(m=>{
+    const div = document.createElement('div');
+    div.className = 'feat-card';
+    div.innerHTML = `<b>${m.food_name}</b> — ${m.qty} porciones · ${m.kcal} kcal 
+      · P ${m.protein_g}g · C ${m.carbs_g}g · G ${m.fat_g}g`;
+    list.appendChild(div);
+  });
+}
+
+async function loadToday() {
+  const setText=(id,val)=>$(id).textContent = String(val ?? 0);
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { $('summaryMsg').textContent='Inicia sesión para ver tu resumen.'; return; }
+
+  // Metas
+  const goal = await loadGoal();
+  setText('goalKcal', goal?.kcal_target || 0);
+  setText('goalProt', goal?.protein_g_target || 0);
+  setText('goalCarb', goal?.carbs_g_target || 0);
+  setText('goalFat',  goal?.fat_g_target   || 0);
+
+  // Totales de hoy
+  // Opción A (si creaste la vista v_daily_totals):
+  let totals = null;
+  const { data, error } = await sb
+    .from('v_daily_totals')
+    .select('kcal, protein_g, carbs_g, fat_g, day')
+    .eq('user_id', user.id)
+    .eq('day', todayStr())
+    .maybeSingle();
+  if (!error && data) totals = data;
+
+  // Opción B (si NO creaste la vista): descomenta este bloque y comenta el bloque de la Opción A
+  // const { data: sumData, error: e2 } = await sb.rpc('sql', {/* no aplica en cliente */});
+  // En cliente, alternativa sin RPC:
+  // const { data: meals, error: e3 } = await sb.from('meals')
+  //   .select('kcal, protein_g, carbs_g, fat_g')
+  //   .eq('user_id', user.id).eq('eaten_at', todayStr());
+  // if (!e3 && meals) {
+  //   totals = meals.reduce((acc,m)=>({
+  //     kcal: (acc.kcal||0)+Number(m.kcal||0),
+  //     protein_g: (acc.protein_g||0)+Number(m.protein_g||0),
+  //     carbs_g: (acc.carbs_g||0)+Number(m.carbs_g||0),
+  //     fat_g: (acc.fat_g||0)+Number(m.fat_g||0),
+  //   }), {});
+  // }
+
+  setText('sumKcal', Math.round(totals?.kcal || 0));
+  setText('sumProt', Math.round(totals?.protein_g || 0));
+  setText('sumCarb', Math.round(totals?.carbs_g || 0));
+  setText('sumFat',  Math.round(totals?.fat_g || 0));
+  $('summaryMsg').textContent = 'Actualizado';
+}
+
+
 // ====== Perfil API
 async function getUser(){ const { data:{ user } } = await sb.auth.getUser(); return user||null; }
 async function getProfile(userId){ const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle(); if(error){ console.error(error); return null; } return data||null; }
