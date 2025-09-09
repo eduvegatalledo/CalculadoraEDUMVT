@@ -173,7 +173,19 @@ function setLoggedUI({ user, profile }){
 }
 function setGuestUI(){ hide("topbar"); show("hero-guest"); hide("dashboard"); }
 
-async function afterLoginShowApp(){ const user = await getUser(); if(!user){ setGuestUI(); return; } const profile = await ensureProfile(); setLoggedUI({ user, profile }); }
+async function afterLoginShowApp() {
+  const user = await getUser();
+  if (!user) {
+    setGuestUI();
+    return;
+  }
+  const profile = await ensureProfile();
+  setLoggedUI({ user, profile });
+
+  // 👇 Nuevo: carga metas y comidas al entrar
+  await loadToday();
+  await loadMealsToday();
+}
 
 // ====== Botones acceso
 $("btnOpenSignup").onclick = ()=> openModal('signupModal');
