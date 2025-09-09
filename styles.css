@@ -1,0 +1,75 @@
+:root{
+  --emerald:#10b981;   /* primario */
+  --aqua:#32e6ff;      /* acento */
+  --ink:#0b1a20;       /* texto principal */
+  --ink-2:#355059;     /* texto secundario */
+  --paper:#f8fffb;     /* fondo uniforme */
+  --glass:#ffffff;     /* superficies */
+  --stroke: rgba(12,130,94,.14);
+  --ring: rgba(18,213,154,.22);
+  --shadow: 0 14px 34px rgba(5,28,22,.08), 0 4px 14px rgba(5,28,22,.06);
+  --radius-xl: 22px; --radius:16px; --radius-sm:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Rubik Rounded','Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
+  color:var(--ink);
+  background: var(--paper);
+  min-height:100dvh;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+
+.wrap{ max-width:1200px; margin:0 auto; padding:0 20px 72px; }
+
+/* Topbar (solo cuando hay sesión) */
+header#topbar{ position:sticky; top:0; z-index:30; }
+.tb{ max-width:1200px; margin:10px auto; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--glass); border:1px solid var(--stroke); border-radius:20px; box-shadow:var(--shadow); }
+.tb-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge-email{color:#1c3b33;font-size:13px; opacity:.85}
+
+/* Botones & Inputs */
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 16px; border-radius:999px; border:1px solid var(--stroke); background:#ffffff; color:#0f2a23; font-weight:800; cursor:pointer; transition: transform .06s ease, box-shadow .18s ease, filter .18s ease; }
+.btn:active{ transform:translateY(1px) }
+.btn-primary{ background:linear-gradient(135deg,#16d39f,#0fb787); color:#04241b; border-color:transparent; box-shadow: 0 12px 26px rgba(16,185,129,.26), inset 0 -2px 0 rgba(0,0,0,.06); }
+.btn-primary:hover{ filter:brightness(1.03) }
+.btn-soft{ background:#f3fbf8; border-color:#e3f3ed }
+.btn[disabled]{ opacity:.6; cursor:not-allowed }
+
+label{ font-weight:700; font-size:13px; display:inline-block; margin-bottom:6px; letter-spacing:.2px }
+input{ width:100%; padding:15px 16px; border-radius:16px; border:1px solid #e5efea; background:#fff; font-size:16px; outline:none; transition:box-shadow .18s,border .18s,transform .03s; }
+input:focus{ border-color:var(--emerald); box-shadow:0 0 0 4px var(--ring); }
+
+/* Hero reorganizado: título a la izquierda, acceso a la derecha */
+.hero{ position:relative; color:#0a2a22; }
+.hero-pad{ padding: clamp(30px, 6vw, 60px) 20px; }
+.hero-grid{ display:grid; grid-template-columns:1fr; gap:20px }
+@media (min-width:980px){ .hero-grid{ grid-template-columns:1.2fr .8fr } }
+
+.display{ margin:8px 0 6px; line-height:1.02; font-weight:800; font-family:'Poppins','Rubik Rounded',sans-serif; font-size: clamp(38px, 7vw, 76px); color:#0c3e33; letter-spacing:.1px }
+.lead{ margin:10px 0 0; max-width:820px; font-size: clamp(16px, 2.2vw, 20px); color:#2f5b52; opacity:.98 }
+.subbrand{ margin:6px 0 2px; font-family:'Poppins','Rubik Rounded',sans-serif; color:#1c433a; opacity:.9 }
+
+/* Card genérico */
+.card{ position:relative; background:var(--glass); border:1px solid var(--stroke); border-radius:var(--radius-xl); box-shadow:var(--shadow); padding:20px; }
+
+/* Acceso pulcro: sólo dos botones */
+.access-card h2{ margin:0 0 10px; font-size:22px; color:#0e3e34 }
+.access-card .muted{ color:#40675e; font-size:13px; margin:0 0 10px }
+
+/* Tabs / dashboard */
+nav.tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 14px }
+nav.tabs button{ border:none; background:#ecfbf6; color:#0b4d3f; padding:10px 16px; border-radius:999px; font-weight:800; cursor:pointer; box-shadow:inset 0 0 0 1px #d8efe8; font-family:'Poppins','Rubik Rounded',sans-serif }
+
+.grid-3{ display:grid; gap:18px; grid-template-columns:1fr }
+@media (min-width:900px){ .grid-3{ grid-template-columns:repeat(3,1fr) } }
+.feat-card{ background:#ffffff; border:1px solid #e6f1ec; border-radius:18px; padding:18px; box-shadow:var(--shadow) }
+.feat-card h3{ margin:0 0 8px; font-size:18px; color:#0a372d; font-family:'Poppins','Rubik Rounded',sans-serif }
+.feat-card p{ margin:0; color:#335a52; font-size:14px }
+
+.hide{ display:none !important }
+.muted{ color:#40675e; font-size:13px }
+.center{ text-align:center }
+.stack-10{ display:grid; gap:10px }
+.stack-12{ display:grid; gap:12px }
+.row{ display:flex; gap:10px; flex-wrap:wrap }
