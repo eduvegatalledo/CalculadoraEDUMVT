@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ProteeMVT — Nutrición simple, progreso real</title>
+  <meta name="description" content="ProteeMVT: calcula tus macros, registra lo que comes y mide tu avance." />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#12d59a" />
+
+  <!-- Social -->
+  <meta property="og:title" content="ProteeMVT — Nutrición simple, progreso real" />
+  <meta property="og:description" content="Calcula tus macros, registra lo que comes y mide tu avance." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/assets/og-preview.png" />
+  <meta property="og:locale" content="es_ES" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Tipografías -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Rubik+Rounded:wght@400;500;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Estilos externos -->
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <!-- Topbar (visible al iniciar sesión) -->
+  <header id="topbar" class="hide" role="banner">
+    <div class="tb">
+      <div class="brand" aria-label="ProteeMVT" style="display:none"></div>
+      <div class="tb-actions">
+        <span id="userBadge" class="badge-email" aria-live="polite"></span>
+        <button id="btnProfile" class="btn btn-soft" type="button" aria-haspopup="dialog" aria-controls="profileModal">Tu perfil</button>
+        <button id="btnHeaderLogout" class="btn" type="button">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO: izquierda título, derecha acceso -->
+  <section id="hero-guest" class="hero" aria-labelledby="heroGuestTitle">
+    <div class="wrap hero-pad">
+      <div class="hero-grid">
+        <!-- Columna izquierda: título -->
+        <div>
+          <h1 id="heroGuestTitle" class="display">Nutrición simple, progreso real</h1>
+          <p class="subbrand">ProteeMVT</p>
+          <p class="lead">Calcula tus macros, registra lo que comes y mide tu avance.</p>
+        </div>
+
+        <!-- Columna derecha: acceso -->
+        <aside class="card access-card" aria-labelledby="accessTitle">
+          <h2 id="accessTitle">Acceso</h2>
+          <p class="muted">Elige una opción para continuar.</p>
+          <div class="stack-10">
+            <button id="btnOpenSignup" class="btn btn-primary" type="button">Regístrate aquí</button>
+            <button id="btnOpenLogin" class="btn btn-soft" type="button">Iniciar sesión</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD (se muestra después de iniciar sesión) -->
+  <main class="wrap" id="main">
+    <section id="dashboard" class="hide" aria-label="Panel de usuario" style="margin-top:6px">
+      <h2>Bienvenido 👋</h2>
+      <nav class="tabs" aria-label="Secciones del panel">
+        <button type="button" onclick="showSection('resumen')">🏠 Resumen</button>
+        <button type="button" onclick="showSection('comidas')">🍽️ Comidas</button>
+        <button type="button" onclick="showSection('progreso')">📊 Progreso</button>
+      </nav>
+      <div id="resumen"><p class="muted">Aquí verás tu progreso y tus metas del día.</p></div>
+      <div id="comidas" class="hide"><p class="muted">Próximamente: registro y búsqueda de alimentos.</p></div>
+      <div id="progreso" class="hide"><p class="muted">Próximamente: gráficos y tendencias.</p></div>
+      <div class="center" style="margin-top:14px">
+        <button class="btn" type="button" onclick="logout()">Cerrar sesión</button>
+      </div>
+    </section>
+
+    <!-- Beneficios -->
+    <section id="beneficios-final" class="grid-3" aria-label="Beneficios principales" style="margin-top:28px">
+      <article class="feat-card"><h3>🎯 Objetivo claro</h3><p>Define metas y la app traduce a acciones simples: proteínas, calorías y hábitos.</p></article>
+      <article class="feat-card"><h3>🍽️ Registro sin fricción</h3><p>Agrega lo que comes en segundos y consulta valores clave sin perder el foco.</p></article>
+      <article class="feat-card"><h3>📈 Progreso motivador</h3><p>Gráficos limpios con métricas que importan para sostener el hábito.</p></article>
+    </section>
+  </main>
+
+  <!-- MODALES: Signup / Login -->
+  <div id="signupModal" class="hide" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+    <section class="wrap" style="position:fixed; inset:0; display:grid; place-items:center; background:rgba(2,16,13,.22)">
+      <div class="card" style="max-width:460px;width:100%">
+        <h2 id="signupTitle">Crear cuenta</h2>
+        <div class="stack-12" style="margin-top:8px">
+          <div>
+            <label for="suEmail">Correo</label>
+            <input id="suEmail" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email" />
+          </div>
+          <div>
+            <label for="suPass">Contraseña</label>
+            <input id="suPass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+          </div>
+        </div>
+        <p id="suMsg" class="muted" style="margin-top:8px" role="status" aria-live="polite"></p>
+        <div class="row" style="margin-top:12px;justify-content:flex-end">
+          <button id="btnCloseSignup" class="btn" type="button">Cancelar</button>
+          <button id="btnDoSignup" class="btn btn-primary" type="button">Crear cuenta</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="loginModal" class="hide" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <section class="wrap" style="position:fixed; inset:0; display:grid; place-items:center; background:rgba(2,16,13,.22)">
+      <div class="card" style="max-width:460px;width:100%">
+        <h2 id="loginTitle">Iniciar sesión</h2>
+        <div class="stack-12" style="margin-top:8px">
+          <div>
+            <label for="liEmail">Correo</label>
+            <input id="liEmail" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email" />
+          </div>
+          <div>
+            <label for="liPass">Contraseña</label>
+            <input id="liPass" type="password" placeholder="Tu contraseña" autocomplete="current-password" />
+          </div>
+        </div>
+        <p id="liMsg" class="muted" style="margin-top:8px" role="status" aria-live="polite"></p>
+        <div class="row" style="margin-top:12px;justify-content:space-between">
+          <button id="btnForgot" class="btn btn-soft" type="button">Olvidé mi contraseña</button>
+          <div>
+            <button id="btnCloseLogin" class="btn" type="button">Cancelar</button>
+            <button id="btnDoLogin" class="btn btn-primary" type="button">Entrar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Perfil -->
+  <div id="profileModal" class="hide" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+    <section class="wrap" style="position:fixed; inset:0; display:grid; place-items:center; background:rgba(2,16,13,.22)">
+      <div class="card" style="max-width:460px;width:100%">
+        <h2 id="profileTitle">Tu perfil</h2>
+        <p class="muted" style="margin-top:4px">Tu correo y nombre visible dentro de la app.</p>
+        <div class="stack-12" style="margin-top:10px">
+          <div>
+            <label for="profEmail">Correo</label>
+            <input id="profEmail" type="email" disabled />
+          </div>
+          <div>
+            <label for="profName">Nombre visible</label>
+            <input id="profName" type="text" placeholder="Tu nombre" />
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px;justify-content:flex-end">
+          <button id="btnCloseProfile" class="btn" type="button">Cerrar</button>
+          <button id="btnSaveProfile" class="btn btn-primary" type="button">Guardar</button>
+        </div>
+        <p id="profMsg" class="muted" style="margin-top:8px" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </div>
+
+  <footer class="wrap" aria-label="Información legal">
+    <p class="muted">© <span id="year"></span> ProteeMVT. Todos los derechos reservados.</p>
+  </footer>
+
+  <!-- SDK Supabase y tu lógica -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
