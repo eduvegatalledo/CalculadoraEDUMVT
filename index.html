@@ -167,5 +167,72 @@
   <!-- SDK Supabase y tu lógica -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="/app.js"></script>
+  <!-- RESUMEN -->
+<div id="resumen">
+  <section class="card" style="margin:10px 0">
+    <h3>Resumen de hoy</h3>
+    <p class="muted" id="summaryMsg">Cargando…</p>
+    <div class="grid-3" style="margin-top:10px">
+      <article class="feat-card">
+        <h4>Calorías</h4>
+        <p><b id="sumKcal">0</b> / <span id="goalKcal">0</span> kcal</p>
+      </article>
+      <article class="feat-card">
+        <h4>Proteína</h4>
+        <p><b id="sumProt">0</b> / <span id="goalProt">0</span> g</p>
+      </article>
+      <article class="feat-card">
+        <h4>Carbos / Grasas</h4>
+        <p><b id="sumCarb">0</b> / <span id="goalCarb">0</span> g &nbsp; | &nbsp;
+           <b id="sumFat">0</b> / <span id="goalFat">0</span> g</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="card" style="margin:10px 0">
+    <h3>Definir metas diarias</h3>
+    <div class="row" style="gap:12px;margin-top:8px">
+      <div><label for="inGoalKcal">Kcal</label><input id="inGoalKcal" type="number" min="0" step="1" placeholder="ej. 2000"></div>
+      <div><label for="inGoalProt">Proteína (g)</label><input id="inGoalProt" type="number" min="0" step="1" placeholder="ej. 150"></div>
+      <div><label for="inGoalCarb">Carbos (g)</label><input id="inGoalCarb" type="number" min="0" step="1" placeholder="ej. 200"></div>
+      <div><label for="inGoalFat">Grasas (g)</label><input id="inGoalFat" type="number" min="0" step="1" placeholder="ej. 70"></div>
+      <div style="align-self:flex-end"><button id="btnSaveGoal" class="btn btn-primary" type="button">Guardar metas</button></div>
+    </div>
+    <p id="goalMsg" class="muted" style="margin-top:6px"></p>
+  </section>
+</div>
+
+<!-- COMIDAS -->
+<div id="comidas" class="hide">
+  <section class="card">
+    <h3>Agregar comida</h3>
+    <div class="row" style="gap:12px;margin-top:8px">
+      <div style="min-width:220px">
+        <label for="mealName">Alimento</label>
+        <input id="mealName" type="text" placeholder="ej. Pechuga de pollo">
+      </div>
+      <div>
+        <label for="mealQty">Cantidad (porciones)</label>
+        <input id="mealQty" type="number" min="0.1" step="0.1" value="1">
+      </div>
+      <div><label for="perKcal">kcal x porción</label><input id="perKcal" type="number" min="0" step="1"></div>
+      <div><label for="perProt">prot (g) x porción</label><input id="perProt" type="number" min="0" step="0.1"></div>
+      <div><label for="perCarb">carb (g) x porción</label><input id="perCarb" type="number" min="0" step="0.1"></div>
+      <div><label for="perFat">grasa (g) x porción</label><input id="perFat" type="number" min="0" step="0.1"></div>
+      <div style="align-self:flex-end"><button id="btnAddMeal" class="btn btn-primary" type="button">Agregar</button></div>
+    </div>
+    <p id="mealMsg" class="muted" style="margin-top:6px"></p>
+  </section>
+
+  <section class="card" style="margin-top:12px">
+    <h3>Hoy</h3>
+    <div id="mealList" class="stack-10" style="margin-top:8px"></div>
+  </section>
+</div>
+
+<!-- PROGRESO (dejamos placeholder; lo llenaremos con gráficos luego) -->
+<div id="progreso" class="hide">
+  <section class="card"><h3>Pronto: gráficos semanales</h3></section>
+</div>
 </body>
 </html>
