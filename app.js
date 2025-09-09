@@ -10,8 +10,9 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = (id)=>document.getElementById(id);
-const show = (id)=>$(id).classList.remove('hide');
-const hide = (id)=>$(id).classList.add('hide');
+const show = (id)=>$(id)?.classList.remove('hide');
+const hide = (id)=>$(id)?.classList.add('hide');
+const isApp = window.location.pathname.endsWith('app.html');
 
 function showSection(sec){ ["resumen","comidas","progreso"].forEach(id=>$(id).classList.toggle("hide", id!==sec)); }
 
@@ -49,7 +50,7 @@ async function saveGoal() {
   msg.textContent = error ? ('Error: '+error.message) : 'Metas guardadas ✅';
   await loadToday(); // refresca resumen
 }
-$('btnSaveGoal').onclick = saveGoal;
+$('btnSaveGoal')?.addEventListener('click', saveGoal);
 
 // ---------- Comidas (meals) ----------
 async function addMeal() {
@@ -87,7 +88,7 @@ async function addMeal() {
   await loadToday();
   await loadMealsToday();
 }
-$('btnAddMeal').onclick = addMeal;
+$('btnAddMeal')?.addEventListener('click', addMeal);
 
 // ---------- Listado & resumen del día ----------
 async function loadMealsToday() {
@@ -166,19 +167,15 @@ async function getProfile(userId){ const { data, error } = await sb.from('profil
 async function ensureProfile(){ const user = await getUser(); if(!user) return null; let prof = await getProfile(user.id); if(!prof){ const { error } = await sb.from('profiles').insert({ id:user.id, display_name:user.email }); if(error) console.error(error); prof = await getProfile(user.id); openModal('profileModal'); } return prof; }
 
 function setLoggedUI({ user, profile }){
-  show("topbar"); // header visible
-  hide("hero-guest");
-  show("dashboard");
+  show("topbar");
+  show("main");
   $("userBadge").textContent = user.email;
 }
-function setGuestUI(){ hide("topbar"); show("hero-guest"); hide("dashboard"); }
+function setGuestUI(){ hide("topbar"); hide("main"); }
 
 async function afterLoginShowApp() {
   const user = await getUser();
-  if (!user) {
-    setGuestUI();
-    return;
-  }
+  if (!user) return;
   const profile = await ensureProfile();
   setLoggedUI({ user, profile });
 
@@ -188,12 +185,12 @@ async function afterLoginShowApp() {
 }
 
 // ====== Botones acceso
-$("btnOpenSignup").onclick = ()=> openModal('signupModal');
-$("btnOpenLogin").onclick = ()=> openModal('loginModal');
+$("btnOpenSignup")?.addEventListener('click', ()=> openModal('signupModal'));
+$("btnOpenLogin")?.addEventListener('click', ()=> openModal('loginModal'));
 
 // ====== Signup
-$("btnCloseSignup").onclick = ()=> closeModal('signupModal');
-$("btnDoSignup").onclick = async ()=>{
+$("btnCloseSignup")?.addEventListener('click', ()=> closeModal('signupModal'));
+$("btnDoSignup")?.addEventListener('click', async ()=>{
   const email = ( $("suEmail").value || '' ).trim();
   const password = ( $("suPass").value || '' ).trim();
   const msg = $("suMsg"); msg.textContent='';
@@ -202,12 +199,12 @@ $("btnDoSignup").onclick = async ()=>{
   const { data, error } = await sb.auth.signUp({ email, password });
   if(error){ msg.textContent = 'Error: '+error.message; return; }
   if(data?.user && !data.session){ msg.textContent='Cuenta creada. Revisa tu correo para confirmar.'; }
-  else{ msg.textContent='Cuenta creada y sesión iniciada ✅'; closeModal('signupModal'); await afterLoginShowApp(); }
-};
+  else{ msg.textContent='Cuenta creada y sesión iniciada ✅'; closeModal('signupModal'); window.location.href='app.html'; }
+});
 
 // ====== Login
-$("btnCloseLogin").onclick = ()=> closeModal('loginModal');
-$("btnDoLogin").onclick = async ()=>{
+$("btnCloseLogin")?.addEventListener('click', ()=> closeModal('loginModal'));
+$("btnDoLogin")?.addEventListener('click', async ()=>{
   const email = ( $("liEmail").value || '' ).trim();
   const password = ( $("liPass").value || '' ).trim();
   const msg = $("liMsg"); msg.textContent='';
@@ -217,39 +214,44 @@ $("btnDoLogin").onclick = async ()=>{
   if(error){ msg.textContent = 'No pudimos iniciar sesión: '+error.message; return; }
   msg.textContent='Sesión iniciada ✅';
   closeModal('loginModal');
-  await afterLoginShowApp();
-};
+  window.location.href='app.html';
+});
 
 // ====== Forgot password
-$("btnForgot").onclick = async ()=>{
+$("btnForgot")?.addEventListener('click', async ()=>{
   const email = ( $("liEmail").value || '' ).trim();
   const msg = $("liMsg"); msg.textContent='';
   if(!/.+@.+\..+/.test(email)){ msg.textContent='Escribe el correo que usaste para registrarte.'; return; }
   const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
   msg.textContent = error ? ('No se pudo enviar: '+error.message) : 'Te enviamos un enlace para restablecer tu contraseña ✅';
-};
+});
 
-async function logout(){ await sb.auth.signOut(); setGuestUI(); }
-$("btnHeaderLogout").onclick = logout;
+async function logout(){ await sb.auth.signOut(); window.location.href='index.html'; }
+$("btnHeaderLogout")?.addEventListener('click', logout);
 
 // ====== Perfil
-$("btnProfile").onclick = async ()=>{ const user = await getUser(); if(!user) return; const profile = await getProfile(user.id); $("profEmail").value = user.email || ''; $("profName").value = profile?.display_name || ''; openModal('profileModal'); };
-$("btnCloseProfile").onclick = ()=> closeModal('profileModal');
-$("btnSaveProfile").onclick = async ()=>{ const user = await getUser(); if(!user) return; const display_name = ( $("profName").value || '' ).trim() || user.email; const { error } = await sb.from('profiles').upsert({ id:user.id, display_name }); $("profMsg").textContent = error ? ('Error: '+error.message) : 'Guardado ✅'; };
+$("btnProfile")?.addEventListener('click', async ()=>{ const user = await getUser(); if(!user) return; const profile = await getProfile(user.id); $("profEmail").value = user.email || ''; $("profName").value = profile?.display_name || ''; openModal('profileModal'); });
+$("btnCloseProfile")?.addEventListener('click', ()=> closeModal('profileModal'));
+$("btnSaveProfile")?.addEventListener('click', async ()=>{ const user = await getUser(); if(!user) return; const display_name = ( $("profName").value || '' ).trim() || user.email; const { error } = await sb.from('profiles').upsert({ id:user.id, display_name }); $("profMsg").textContent = error ? ('Error: '+error.message) : 'Guardado ✅'; });
 
 // ====== Restaurar sesión desde enlaces de email
 (async ()=>{
-  $("year").textContent = new Date().getFullYear();
+  $("year")?.textContent = new Date().getFullYear();
   const hash = window.location.hash || "";
   if(hash.includes("access_token") && hash.includes("refresh_token")){
     const p = new URLSearchParams(hash.substring(1));
     await sb.auth.setSession({ access_token: p.get("access_token"), refresh_token: p.get("refresh_token") });
     history.replaceState({}, document.title, window.location.pathname);
   }
-  if(hash.includes("type=recovery")){
+  if(!isApp && hash.includes("type=recovery")){
     // Si viene desde email de recuperación, abrir modal de login para que establezca nueva pass si el flujo lo pide
     openModal('loginModal');
   }
   const { data:{ user } } = await sb.auth.getUser();
-  if(user) await afterLoginShowApp(); else setGuestUI();
+  if(isApp){
+    if(user) await afterLoginShowApp();
+    else window.location.replace('index.html');
+  }else{
+    if(user) window.location.replace('app.html');
+  }
 })();
