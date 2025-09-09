@@ -100,3 +100,14 @@ $("btnSaveProfile").onclick = async ()=>{ const user = await getUser(); if(!user
   const { data:{ user } } = await sb.auth.getUser();
   if(user) await afterLoginShowApp(); else setGuestUI();
 })();
+(async () => {
+  console.log("🔍 Probando conexión con Supabase...");
+
+  const { data, error } = await sb.from("profiles").select("*").limit(1);
+
+  if (error) {
+    console.error("❌ Error en conexión:", error.message);
+  } else {
+    console.log("✅ Conexión exitosa. Primeros registros:", data);
+  }
+})();
