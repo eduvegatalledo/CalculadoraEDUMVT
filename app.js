@@ -31,18 +31,41 @@ let goals=null;
 let mealPage=0;
 
 // Eventos de navegación
-$('#navToHub').onclick = () => show('hub');
-$('#navToGoals').onclick = $('#ctaGoGoals').onclick = () => show('goals');
-$('#navToMeals').onclick = $('#ctaGoMeals').onclick = () => show('meals');
-$('#navToProgress').onclick = $('#ctaGoProgress').onclick = () => show('progress');
-$('#btnLogout').onclick = async()=>{ await sb.auth.signOut(); location.href='/'; };
-$('#btnSaveGoals').onclick = saveGoals;
-$('#btnAddMeal').onclick = addMeal;
-$('#mealsTbody').addEventListener('click',e=>{
+$('#navToHub')?.addEventListener('click', () => show('hub'));
+$('#navToGoals')?.addEventListener('click', () => show('goals'));
+$('#ctaGoGoals')?.addEventListener('click', () => show('goals'));
+$('#navToMeals')?.addEventListener('click', () => show('meals'));
+$('#ctaGoMeals')?.addEventListener('click', () => show('meals'));
+$('#navToProgress')?.addEventListener('click', () => show('progress'));
+$('#ctaGoProgress')?.addEventListener('click', () => show('progress'));
+$('#btnLogout')?.addEventListener('click', async()=>{ await sb.auth.signOut(); location.href='/'; });
+$('#btnSaveGoals')?.addEventListener('click', saveGoals);
+$('#btnAddMeal')?.addEventListener('click', addMeal);
+$('#mealsTbody')?.addEventListener('click',e=>{
   const btn = e.target.closest('.btnDelMeal');
   if(btn) deleteMeal(btn.dataset.id);
 });
-$('#btnMoreMeals').onclick = ()=>{ mealPage++; loadMealsToday(false); };
+$('#btnMoreMeals')?.addEventListener('click', ()=>{ mealPage++; loadMealsToday(false); });
+
+// Landing: manejo de modales de acceso
+document.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.getElementById('btnOpenLogin');
+  const signupBtn = document.getElementById('btnOpenSignup');
+  const loginModal = document.getElementById('loginModal');
+  const signupModal = document.getElementById('signupModal');
+  const btnCloseLogin = document.getElementById('btnCloseLogin');
+  const btnCloseSignup = document.getElementById('btnCloseSignup');
+
+  if (loginBtn && loginModal) {
+    loginBtn.addEventListener('click', () => loginModal.classList.remove('hide'));
+    btnCloseLogin?.addEventListener('click', () => loginModal.classList.add('hide'));
+  }
+
+  if (signupBtn && signupModal) {
+    signupBtn.addEventListener('click', () => signupModal.classList.remove('hide'));
+    btnCloseSignup?.addEventListener('click', () => signupModal.classList.add('hide'));
+  }
+});
 
 // Carga inicial y guard de auth
 document.addEventListener('DOMContentLoaded', async()=>{
