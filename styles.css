@@ -1,4 +1,7 @@
+codex/generate-static-web-app-files-for-prouti
+/* Estilos globales para Prouti (responsivo y accesible) */
 /* styles.css — Estilos globales, responsivo y accesible, sin frameworks */
+main
 :root{
   --emerald:#10b981; --ink:#0b1a20; --ink-2:#355059; --paper:#f8fffb; --glass:#ffffff;
   --stroke: rgba(12,130,94,.14); --ring: rgba(18,213,154,.22);
@@ -17,8 +20,11 @@ body{
 /* Topbar */
 header#topbar{ position:sticky; top:0; z-index:30; }
 .tb{ max-width:1200px; margin:10px auto; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--glass); border:1px solid var(--stroke); border-radius:20px; box-shadow:var(--shadow); }
+ codex/generate-static-web-app-files-for-prouti
+.badge-email{color:#1c3b33;font-size:13px; opacity:.85}
 .tb-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .badge-email{color:#1c3b33;font-size:13px;opacity:.85}
+main
 
 /* Botones e inputs */
 .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 16px; border-radius:999px; border:1px solid var(--stroke); background:#fff; color:#0f2a23; font-weight:800; cursor:pointer; transition: transform .06s ease, box-shadow .18s ease, filter .18s ease; }
@@ -42,6 +48,11 @@ input:focus{ border-color:var(--emerald); box-shadow:0 0 0 4px var(--ring); }
 .access-card h2{ margin:0 0 10px; font-size:22px; color:#0e3e34 }
 .access-card .muted{ color:#40675e; font-size:13px; margin:0 0 10px }
 
+codex/generate-static-web-app-files-for-prouti
+.modal-backdrop{position:fixed; inset:0; display:grid; place-items:center; background:rgba(2,16,13,.22)}
+
+/* Tabs / dashboard */
+main
 nav.tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 14px }
 nav.tabs button{ border:none; background:#ecfbf6; color:#0b4d3f; padding:10px 16px; border-radius:999px; font-weight:800; cursor:pointer; box-shadow:inset 0 0 0 1px #d8efe8; font-family:'Poppins','Rubik Rounded',sans-serif }
 

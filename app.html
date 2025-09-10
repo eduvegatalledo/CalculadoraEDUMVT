@@ -1,15 +1,84 @@
+ codex/generate-static-web-app-files-for-prouti
+<!-- Panel privado de Prouti post-login -->
+<!DOCTYPE html>
+
 <!doctype html>
 <!-- app.html — Panel privado. Requiere sesión. Muestra menú y secciones. -->
+main
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+ codex/generate-static-web-app-files-for-prouti
+  <title>Prouti — Panel</title>
+
   <title>Prouti — Tu panel</title>
   <meta name="theme-color" content="#10b981" />
+main
   <link rel="stylesheet" href="/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Rubik+Rounded:wght@400;500;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
+ codex/generate-static-web-app-files-for-prouti
+<header id="topbar" class="hide" role="banner">
+  <div class="tb">
+    <span id="userBadge" class="badge-email" aria-live="polite"></span>
+    <button id="btnHeaderLogout" class="btn" type="button">Salir</button>
+  </div>
+</header>
+
+<main id="main" class="hide">
+  <nav class="grid-3" aria-label="Secciones principales" style="margin-top:12px">
+    <a href="#" class="card" onclick="showSection('metas');return false;">🧮 Calcula tus macros</a>
+    <a href="#" class="card" onclick="showSection('comidas');return false;">🍽️ Registra tus comidas</a>
+    <a href="#" class="card" onclick="showSection('progreso');return false;">📈 Mide tu avance</a>
+  </nav>
+
+  <section id="resumen" style="margin-top:20px">
+    <h2>Resumen de hoy</h2>
+    <p class="muted" id="summaryMsg">Cargando…</p>
+    <div class="grid-3" style="margin-top:10px">
+      <article class="feat-card">
+        <h3>Calorías</h3>
+        <p><b id="sumKcal">0</b> / <span id="goalKcal">0</span> kcal</p>
+      </article>
+      <article class="feat-card">
+        <h3>Proteína</h3>
+        <p><b id="sumProt">0</b> / <span id="goalProt">0</span> g</p>
+      </article>
+      <article class="feat-card">
+        <h3>Carbos / Grasas</h3>
+        <p><b id="sumCarb">0</b> / <span id="goalCarb">0</span> g &nbsp; | &nbsp; <b id="sumFat">0</b> / <span id="goalFat">0</span> g</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="metas" class="hide" style="margin-top:20px">
+    <div class="card">
+      <h2>Metas diarias</h2>
+      <div class="row" style="gap:12px;margin-top:8px">
+        <div><label for="inGoalKcal">Kcal</label><input id="inGoalKcal" type="number" min="0" step="1" placeholder="ej. 2000"></div>
+        <div><label for="inGoalProt">Proteína (g)</label><input id="inGoalProt" type="number" min="0" step="1" placeholder="ej. 150"></div>
+        <div><label for="inGoalCarb">Carbos (g)</label><input id="inGoalCarb" type="number" min="0" step="1" placeholder="ej. 200"></div>
+        <div><label for="inGoalFat">Grasas (g)</label><input id="inGoalFat" type="number" min="0" step="1" placeholder="ej. 70"></div>
+        <div style="align-self:flex-end"><button id="btnSaveGoal" class="btn btn-primary" type="button">Guardar metas</button></div>
+      </div>
+      <p id="goalMsg" class="muted" role="status" aria-live="polite" style="margin-top:6px"></p>
+    </div>
+  </section>
+
+  <section id="comidas" class="hide" style="margin-top:20px">
+    <div class="card">
+      <h2>Agregar comida</h2>
+      <div class="row" style="gap:12px;margin-top:8px">
+        <div style="min-width:220px">
+          <label for="mealName">Alimento</label>
+          <input id="mealName" type="text" placeholder="ej. Pechuga de pollo">
+        </div>
+        <div>
+          <label for="mealQty">Cantidad (porciones)</label>
+          <input id="mealQty" type="number" min="0.1" step="0.1" value="1">
+
 
   <!-- Topbar -->
   <header id="topbar" class="hide">
@@ -71,9 +140,32 @@
           <div><label for="inGoalCarb">Carbos (g)</label><input id="inGoalCarb" type="number" min="0" step="1" placeholder="ej. 200"></div>
           <div><label for="inGoalFat">Grasas (g)</label><input id="inGoalFat" type="number" min="0" step="1" placeholder="ej. 70"></div>
           <div style="align-self:flex-end"><button id="btnSaveGoal" class="btn btn-primary" type="button">Guardar metas</button></div>
+ main
         </div>
         <p id="goalMsg" class="muted" style="margin-top:6px"></p>
       </div>
+ codex/generate-static-web-app-files-for-prouti
+      <p id="mealMsg" class="muted" role="status" aria-live="polite" style="margin-top:6px"></p>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h2>Hoy</h2>
+      <div id="mealList" class="stack-10" style="margin-top:8px"></div>
+    </div>
+  </section>
+
+  <section id="progreso" class="hide" style="margin-top:20px">
+    <div class="card">
+      <h2>Progreso</h2>
+      <p class="muted">Pronto: gráficos semanales</p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap" aria-label="Información legal">
+  <p class="muted">© <span id="year"></span> Prouti. Todos los derechos reservados.</p>
+</footer>
+
     </section>
 
     <!-- COMIDAS -->
@@ -113,6 +205,7 @@
   <footer class="wrap" aria-label="Información legal">
     <p class="muted">© <span id="year"></span> Prouti. Todos los derechos reservados.</p>
   </footer>
+ main
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="/app.js"></script>
