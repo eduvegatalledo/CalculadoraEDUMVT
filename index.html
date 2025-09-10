@@ -1,14 +1,24 @@
+codex/generate-static-web-app-files-for-prouti
 <!-- Landing pública de Prouti con acceso (login/registro) -->
 <!DOCTYPE html>
+<!doctype html>
+<!-- index.html — Landing pública con acceso (login/registro). No muestra contenido privado. -->
+main
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Prouti — Nutrición simple, progreso real</title>
+codex/generate-static-web-app-files-for-prouti
+  <meta name="description" content="Prouti: Calcula tus macros, registra lo que comes y mide tu avance." />
+  <meta name="theme-color" content="#10b981" />
+main
   <link rel="stylesheet" href="/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Rubik+Rounded:wght@400;500;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
 
+codex/generate-static-web-app-files-for-prouti
   <section class="hero" aria-labelledby="landingTitle">
     <div class="wrap hero-grid hero-pad center">
       <h1 id="landingTitle" class="display">Nutrición simple, progreso real</h1>
@@ -43,13 +53,40 @@
           <button id="btnCloseSignup" class="btn" type="button">Cancelar</button>
           <button id="btnDoSignup" class="btn btn-primary" type="button">Crear cuenta</button>
         </div>
-      </div>
-    </section>
-  </div>
 
+  <section id="hero-guest" class="hero" aria-labelledby="accessTitle">
+    <div class="wrap hero-pad">
+      <!-- Texto principal -->
+      <div style="max-width: 820px; margin: 0 auto 28px;">
+        <h1 class="display" style="margin-bottom:8px">Nutrición simple,<br>progreso real</h1>
+        <p class="subbrand">Prouti</p>
+        <p class="lead">Calcula tus macros, registra lo que comes y mide tu avance.</p>
+      </div>
+
+      <!-- Tarjeta de acceso -->
+      <div style="display:grid; place-items:center; margin-top:24px;">
+        <aside class="card access-card" aria-labelledby="accessTitle" style="max-width:480px; width:100%">
+          <h2 id="accessTitle" style="margin-top:0; text-align:center">Acceso</h2>
+          <p class="muted" style="text-align:center">Inicia sesión o crea tu cuenta</p>
+          <div class="stack-10" style="margin-top:10px">
+            <button id="btnOpenLogin" class="btn btn-primary" type="button">Iniciar sesión</button>
+            <button id="btnOpenSignup" class="btn btn-soft" type="button">Regístrate</button>
+          </div>
+          <p id="accessMsg" class="muted" style="margin-top:8px" role="status" aria-live="polite"></p>
+        </aside>
+main
+      </div>
+    </div>
+  </section>
+
+  <!-- Modales: Login -->
   <div id="loginModal" class="hide" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <section class="wrap modal-backdrop">
+codex/generate-static-web-app-files-for-prouti
       <div class="card" style="max-width:460px;width:100%">
+
+      <div class="card modal-card">
+ main
         <h2 id="loginTitle">Iniciar sesión</h2>
         <div class="stack-12" style="margin-top:8px">
           <div>
@@ -68,6 +105,30 @@
             <button id="btnCloseLogin" class="btn" type="button">Cancelar</button>
             <button id="btnDoLogin" class="btn btn-primary" type="button">Entrar</button>
           </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modales: Signup -->
+  <div id="signupModal" class="hide" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+    <section class="wrap modal-backdrop">
+      <div class="card modal-card">
+        <h2 id="signupTitle">Crear cuenta</h2>
+        <div class="stack-12" style="margin-top:8px">
+          <div>
+            <label for="suEmail">Correo</label>
+            <input id="suEmail" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email" />
+          </div>
+          <div>
+            <label for="suPass">Contraseña</label>
+            <input id="suPass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+          </div>
+        </div>
+        <p id="suMsg" class="muted" style="margin-top:8px" role="status" aria-live="polite"></p>
+        <div class="row" style="margin-top:12px;justify-content:flex-end">
+          <button id="btnCloseSignup" class="btn" type="button">Cancelar</button>
+          <button id="btnDoSignup" class="btn btn-primary" type="button">Crear cuenta</button>
         </div>
       </div>
     </section>
