@@ -1,92 +1,77 @@
-// Helpers
-const $ = (id)=>document.getElementById(id);
-const show = id => $(id)?.classList.remove('hide');
-const hide = id => $(id)?.classList.add('hide');
-const setText = (id,v)=>{ const el=$(id); if(el) el.textContent = String(v ?? ''); };
-const todayStr = ()=> new Date().toISOString().slice(0,10);
+// Utilidades básicas
+const $ = id => document.getElementById(id);
+const qs = sel => document.querySelector(sel);
+const todayStr = () => new Date().toISOString().slice(0,10);
 
-function openModal(id){
-  const el=$(id); if(!el) return; el.classList.remove('hide'); document.body.style.overflow='hidden';
-  const first = el.querySelector('input,button,[tabindex]:not([tabindex="-1"])'); if(first) setTimeout(()=>first.focus(),0);
-}
-function closeModal(id){
-  const el=$(id); if(!el) return; el.classList.add('hide'); document.body.style.overflow='';
-}
-function wireAuthButtons(){
-  $('btnOpenLogin')?.addEventListener('click', ()=>openModal('loginModal'));
-  $('btnOpenSignup')?.addEventListener('click',()=>openModal('signupModal'));
-  $('btnCloseLogin')?.addEventListener('click', ()=>closeModal('loginModal'));
-  $('btnCloseSignup')?.addEventListener('click',()=>closeModal('signupModal'));
-}
-function wireModalDismiss(){
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ ['loginModal','signupModal'].forEach(id=>{ const el=$(id); if(el && !el.classList.contains('hide')) closeModal(id); }) } });
-  ['loginModal','signupModal'].forEach(id=>{
-    const el=$(id); el?.addEventListener('click', e=>{ if(!e.target.closest('.modal-card')) closeModal(id); });
-  });
-}
-wireAuthButtons(); wireModalDismiss();
-const q = new URLSearchParams(location.search);
-const m = q.get('modal'); // 'login' | 'signup'
-if(m==='login')  openModal('loginModal');
-if(m==='signup') openModal('signupModal');
-
-// Supabase client
 const { createClient } = supabase;
 const SUPABASE_URL = "https://nzzzeycpfdtvzphbupbf.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56enpleWNwZmR0dnpwaGJ1cGJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0NDA3MTIsImV4cCI6MjA3MzAxNjcxMn0.HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56enpleWNwZmR0dnpwaGJ1cGJmIiwi cm9sZSI6ImFub24iLCJpYXQiOjE3NTc0NDA3MTIsImV4cCI6MjA3MzAxNjcxMn0.HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44";
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Auth actions
-$('btnDoSignup')?.addEventListener('click', async()=>{
-  const email = ($('suEmail')?.value||'').trim();
-  const password = ($('suPass')?.value||'').trim();
-  const msg = $('suMsg'); if(msg) msg.textContent='';
-  if(!/.+@.+\..+/.test(email)){ msg.textContent='Ingresa un correo válido.'; return; }
-  if(password.length<6){ msg.textContent='La contraseña debe tener al menos 6 caracteres.'; return; }
-  const { data, error } = await sb.auth.signUp({ email, password });
-  if(error){ msg.textContent='Error: '+error.message; return; }
-  if(data.user && !data.session){ msg.textContent='Cuenta creada. Revisa tu correo para confirmar.'; }
-  else{ window.location.href='/app.html'; }
-});
-
-$('btnDoLogin')?.addEventListener('click', async()=>{
-  const email = ($('liEmail')?.value||'').trim();
-  const password = ($('liPass')?.value||'').trim();
-  const msg = $('liMsg'); if(msg) msg.textContent='';
-  if(!/.+@.+\..+/.test(email)){ msg.textContent='Ingresa un correo válido.'; return; }
-  if(!password){ msg.textContent='Ingresa tu contraseña.'; return; }
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if(error){ msg.textContent='No pudimos iniciar sesión: '+error.message; return; }
-  window.location.href='/app.html';
-});
-
-$('btnForgot')?.addEventListener('click', async()=>{
-  const email = ($('liEmail')?.value||'').trim();
-  const msg = $('liMsg'); if(msg) msg.textContent='';
-  if(!/.+@.+\..+/.test(email)){ msg.textContent='Escribe el correo que usaste.'; return; }
-  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
-  msg.textContent = error ? ('No se pudo enviar: '+error.message) : 'Enlace enviado ✅';
-});
-
-$('btnHeaderLogout')?.addEventListener('click', async()=>{
-  await sb.auth.signOut();
-  window.location.href='/';
-});
-
-// Panel functions
-function showSection(sec){
-  ['resumen','metas','comidas','progreso'].forEach(id=>$(id)?.classList.toggle('hide', id!==sec));
+const formatKcal = n => `${Math.round(n)} kcal`;
+const formatGrams = n => `${Math.round(n)} g`;
+function relTime(ts){
+  const diff = Math.floor((Date.now()-ts)/1000);
+  if(diff < 60) return `hace ${diff}s`;
+  if(diff < 3600) return `hace ${Math.floor(diff/60)}m`;
+  if(diff < 86400) return `hace ${Math.floor(diff/3600)}h`;
+  return `hace ${Math.floor(diff/86400)}d`;
 }
 
-async function saveGoal(){
-  const msg = $('goalMsg'); if(msg) msg.textContent='';
-  const kcal=Number($('inGoalKcal')?.value||0);
-  const prot=Number($('inGoalProt')?.value||0);
-  const carb=Number($('inGoalCarb')?.value||0);
-  const fat=Number($('inGoalFat')?.value||0);
-  if(kcal<=0 || prot<0 || carb<0 || fat<0){ msg.textContent='Revisa los valores.'; return; }
+function renderEmptyState(container,title,ctaText,onClick){
+  container.innerHTML = '';
+  const div=document.createElement('div');
+  div.className='center';
+  const p=document.createElement('p');p.textContent=title;p.className='muted';div.appendChild(p);
+  const btn=document.createElement('button');btn.type='button';btn.textContent=ctaText;btn.className='btn btn-primary';btn.addEventListener('click',onClick);div.appendChild(btn);
+  container.appendChild(div);
+}
+
+async function loadToday(){
+  const cards = $('#summaryCards');
+  cards.querySelectorAll('.stat-card').forEach(c=>c.classList.add('skeleton'));
   const { data:{ user } } = await sb.auth.getUser();
-  if(!user){ msg.textContent='Inicia sesión.'; return; }
+  if(!user){ location.href='/'; return; }
+  const [{ data:goal }, { data:totals }] = await Promise.all([
+    sb.from('goals').select('*').eq('user_id', user.id).maybeSingle(),
+    sb.from('v_daily_totals').select('*').eq('user_id', user.id).eq('day', todayStr()).maybeSingle()
+  ]);
+  $('#goalKcal').textContent = goal?.kcal_target || 0;
+  $('#goalProt').textContent = goal?.protein_g_target || 0;
+  $('#goalCarb').textContent = goal?.carbs_g_target || 0;
+  $('#goalFat').textContent = goal?.fat_g_target || 0;
+  $('#sumKcal').textContent = Math.round(totals?.kcal || 0);
+  $('#sumProt').textContent = Math.round(totals?.protein_g || 0);
+  $('#sumCarb').textContent = Math.round(totals?.carbs_g || 0);
+  $('#sumFat').textContent = Math.round(totals?.fat_g || 0);
+  cards.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('skeleton'));
+  $('#summaryTime').textContent = 'Actualizado ' + relTime(Date.now());
+  if(!goal){
+    renderEmptyState(cards,'Configura tus metas','Configura tus metas',()=>location.hash='#goals');
+  }
+}
+
+async function loadGoals(){
+  const { data:{ user } } = await sb.auth.getUser();
+  if(!user) return;
+  const { data } = await sb.from('goals').select('*').eq('user_id', user.id).maybeSingle();
+  if(data){
+    $('#metaKcal').value = data.kcal_target || '';
+    $('#metaProt').value = data.protein_g_target || '';
+    $('#metaCarb').value = data.carbs_g_target || '';
+    $('#metaGrasa').value = data.fat_g_target || '';
+  }
+}
+
+async function saveGoals(){
+  const msg = $('#goalMsg'); msg.textContent='';
+  const kcal = Number($('#metaKcal').value);
+  const prot = Number($('#metaProt').value);
+  const carb = Number($('#metaCarb').value);
+  const fat = Number($('#metaGrasa').value);
+  if(kcal<=0){ msg.textContent='Ingresa valores válidos.'; return; }
+  const { data:{ user } } = await sb.auth.getUser();
+  if(!user){ location.href='/'; return; }
   const { error } = await sb.from('goals').upsert({
     user_id:user.id,
     kcal_target:kcal,
@@ -94,99 +79,89 @@ async function saveGoal(){
     carbs_g_target:carb,
     fat_g_target:fat
   });
-  msg.textContent = error ? ('Error: '+error.message) : 'Metas guardadas ✅';
-  await loadSummary();
+  msg.textContent = error ? ('Error: '+error.message) : 'Metas guardadas';
+  await loadToday();
 }
-$('btnSaveGoal')?.addEventListener('click', saveGoal);
 
-async function loadSummary(){
+let mealPage = 0;
+async function loadMealsToday(reset=true){
+  const body = $('#mealTable');
+  if(reset){ body.innerHTML=''; mealPage=0; }
   const { data:{ user } } = await sb.auth.getUser();
-  if(!user){ setText('summaryMsg','Inicia sesión.'); return; }
-  const { data:goal } = await sb.from('goals').select('*').eq('user_id', user.id).maybeSingle();
-  const { data:totals } = await sb.from('v_daily_totals').select('*').eq('user_id', user.id).eq('day', todayStr()).maybeSingle();
-  setText('goalKcal', goal?.kcal_target || 0);
-  setText('goalProt', goal?.protein_g_target || 0);
-  setText('goalCarb', goal?.carbs_g_target || 0);
-  setText('goalFat', goal?.fat_g_target || 0);
-  setText('sumKcal', Math.round(totals?.kcal || 0));
-  setText('sumProt', Math.round(totals?.protein_g || 0));
-  setText('sumCarb', Math.round(totals?.carbs_g || 0));
-  setText('sumFat', Math.round(totals?.fat_g || 0));
-  setText('summaryMsg','Actualizado');
+  if(!user) return;
+  const { data, error, count } = await sb.from('meals')
+    .select('id,eaten_at,food_name,kcal,protein_g,carbs_g,fat_g',{ count:'exact' })
+    .eq('user_id', user.id).eq('eaten_at', todayStr())
+    .order('id',{ascending:false})
+    .range(mealPage*10, mealPage*10+9);
+  if(error){ body.innerHTML=`<tr><td colspan="7" class="muted">Error: ${error.message}</td></tr>`; return; }
+  if(reset && (!data || data.length===0)){
+    body.innerHTML=`<tr><td colspan="7" class="muted">Aún no registras comidas hoy.</td></tr>`;
+    $('#btnMoreMeals').classList.add('hide');
+    return;
+  }
+  data.forEach(m=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>--:--</td><td>${m.food_name}</td><td>${Math.round(m.kcal)}</td><td>${Math.round(m.protein_g)}</td><td>${Math.round(m.carbs_g)}</td><td>${Math.round(m.fat_g)}</td><td><button class="chip" data-id="${m.id}">✕</button></td>`;
+    body.appendChild(tr);
+  });
+  const more=$('#btnMoreMeals');
+  if((mealPage+1)*10 < (count||0)) more.classList.remove('hide'); else more.classList.add('hide');
 }
 
 async function addMeal(){
-  const name = ($('mealName')?.value||'').trim();
-  const qty = Number($('mealQty')?.value||0);
-  const perKcal = Number($('perKcal')?.value||0);
-  const perProt = Number($('perProt')?.value||0);
-  const perCarb = Number($('perCarb')?.value||0);
-  const perFat = Number($('perFat')?.value||0);
-  const msg = $('mealMsg'); if(msg) msg.textContent='';
-  if(!name || qty<=0){ msg.textContent='Datos inválidos.'; return; }
+  const msg = $('#mealMsg'); msg.textContent='';
+  const name = $('#mealName').value.trim();
+  const qty = Number($('#mealQty').value||0);
+  const prot = Number($('#mealProt').value||0);
+  const carb = Number($('#mealCarb').value||0);
+  const fat = Number($('#mealFat').value||0);
+  const kcalInput = Number($('#mealKcal').value||0);
+  if(!name || qty<=0){ msg.textContent='Datos inválidos'; return; }
   const { data:{ user } } = await sb.auth.getUser();
-  if(!user){ msg.textContent='Inicia sesión.'; return; }
-  const meal = {
+  if(!user){ location.href='/'; return; }
+  const kcal = kcalInput>0 ? kcalInput : prot*4 + carb*4 + fat*9;
+  const { error } = await sb.from('meals').insert({
     user_id:user.id,
-    eaten_at: todayStr(),
+    eaten_at:todayStr(),
     food_name:name,
     qty,
-    kcal: qty*perKcal,
-    protein_g: qty*perProt,
-    carbs_g: qty*perCarb,
-    fat_g: qty*perFat
-  };
-  const { error } = await sb.from('meals').insert(meal);
-  msg.textContent = error ? ('Error: '+error.message) : 'Agregado ✅';
-  if(!error){
-    ['mealName','mealQty','perKcal','perProt','perCarb','perFat'].forEach(id=>{ const el=$(id); if(el) el.value=''; });
-    loadMealsToday();
-    loadSummary();
-  }
-}
-$('btnAddMeal')?.addEventListener('click', addMeal);
-
-async function loadMealsToday(){
-  const list = $('mealList'); if(!list) return;
-  list.innerHTML='';
-  const { data:{ user } } = await sb.auth.getUser();
-  if(!user){ list.innerHTML='<p class="muted">Inicia sesión.</p>'; return; }
-  const { data, error } = await sb.from('meals')
-    .select('id, food_name, qty, kcal, protein_g, carbs_g, fat_g')
-    .eq('user_id', user.id).eq('eaten_at', todayStr()).order('id', { ascending:false });
-  if(error){ list.innerHTML=`<p class="muted">Error: ${error.message}</p>`; return; }
-  if(!data?.length){ list.innerHTML='<p class="muted">Aún no registras comidas hoy.</p>'; return; }
-  data.forEach(m=>{
-    const div=document.createElement('div');
-    div.className='feat-card';
-    div.textContent=`${m.food_name} — ${m.qty} porciones · ${m.kcal} kcal · P ${m.protein_g}g · C ${m.carbs_g}g · G ${m.fat_g}g`;
-    list.appendChild(div);
+    protein_g:prot,
+    carbs_g:carb,
+    fat_g:fat,
+    kcal
   });
-}
-
-// Session routing
-async function checkSession(){
-  const { data:{ user } } = await sb.auth.getUser();
-  const isApp = window.location.pathname.endsWith('app.html');
-  if(isApp){
-    if(!user){ window.location.replace('/'); return; }
-    show('topbar'); show('main');
-    setText('userBadge', user.email);
-    await loadSummary();
-    await loadMealsToday();
-  }else{
-    if(user) window.location.replace('/app.html');
+  msg.textContent = error ? ('Error: '+error.message) : 'Agregado';
+  if(!error){
+    ['mealName','mealQty','mealProt','mealCarb','mealFat','mealKcal'].forEach(id=>{$(id).value='';});
+    $('#mealQty').value='100';
+    loadMealsToday();
+    loadToday();
   }
 }
 
-// Init
-(async()=>{
-  setText('year', new Date().getFullYear());
-  const hash = window.location.hash;
-  if(hash.includes('access_token') && hash.includes('refresh_token')){
-    const p = new URLSearchParams(hash.substring(1));
-    await sb.auth.setSession({ access_token:p.get('access_token'), refresh_token:p.get('refresh_token') });
-    history.replaceState({}, document.title, window.location.pathname);
-  }
-  await checkSession();
-})();
+async function deleteMeal(id){
+  if(!id) return;
+  if(!confirm('¿Eliminar comida?')) return;
+  await sb.from('meals').delete().eq('id', id);
+  loadMealsToday();
+  loadToday();
+}
+
+$('#mealTable').addEventListener('click',e=>{
+  const btn=e.target.closest('button[data-id]');
+  if(btn) deleteMeal(btn.dataset.id);
+});
+$('#btnMoreMeals').addEventListener('click',()=>{mealPage++;loadMealsToday(false);});
+$('#btnSaveGoals').addEventListener('click',saveGoals);
+$('#btnAddMeal').addEventListener('click',addMeal);
+$('#btnLogout').addEventListener('click',async()=>{await sb.auth.signOut();location.href='/';});
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session){ location.href='/'; return; }
+  $('#userEmail').textContent = session.user.email;
+  await loadToday();
+  await loadGoals();
+  await loadMealsToday();
+});
