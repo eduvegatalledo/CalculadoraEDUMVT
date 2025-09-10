@@ -47,30 +47,93 @@ $('#mealsTbody')?.addEventListener('click',e=>{
 });
 $('#btnMoreMeals')?.addEventListener('click', ()=>{ mealPage++; loadMealsToday(false); });
 
-// Landing: manejo de modales de acceso
+// Landing: manejo de modales y auth
 document.addEventListener('DOMContentLoaded', () => {
-  const loginBtn = document.getElementById('btnOpenLogin');
-  const signupBtn = document.getElementById('btnOpenSignup');
-  const loginModal = document.getElementById('loginModal');
-  const signupModal = document.getElementById('signupModal');
-  const btnCloseLogin = document.getElementById('btnCloseLogin');
-  const btnCloseSignup = document.getElementById('btnCloseSignup');
+  const loginBtn = $('#btnOpenLogin');
+  const signupBtn = $('#btnOpenSignup');
+  const loginModal = $('#loginModal');
+  const signupModal = $('#signupModal');
+  const btnCloseLogin = $('#btnCloseLogin');
+  const btnCloseSignup = $('#btnCloseSignup');
+  const btnDoLogin = $('#btnDoLogin');
+  const btnDoSignup = $('#btnDoSignup');
+  const btnForgot = $('#btnForgot');
 
+  // Abrir/cerrar modales
   if (loginBtn && loginModal) {
     loginBtn.addEventListener('click', () => loginModal.classList.remove('hide'));
     btnCloseLogin?.addEventListener('click', () => loginModal.classList.add('hide'));
   }
-
   if (signupBtn && signupModal) {
     signupBtn.addEventListener('click', () => signupModal.classList.remove('hide'));
     btnCloseSignup?.addEventListener('click', () => signupModal.classList.add('hide'));
   }
+
+  // Login
+  btnDoLogin?.addEventListener('click', async () => {
+    const email = $('#liEmail')?.value.trim();
+    const pass = $('#liPass')?.value;
+    if (!email || !pass) { setLive('liMsg', 'Ingresa correo y contraseña'); return; }
+    btnDoLogin.disabled = true;
+    setLive('liMsg', '');
+    try {
+      const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if (error) throw error;
+      location.href = '/app.html';
+    } catch (err) {
+      console.error('Login error', err);
+      setLive('liMsg', err.message || 'Credenciales incorrectas');
+      btnDoLogin.disabled = false;
+    }
+  });
+
+  // Registro
+  btnDoSignup?.addEventListener('click', async () => {
+    const email = $('#suEmail')?.value.trim();
+    const pass = $('#suPass')?.value;
+    if (!email || !pass) { setLive('suMsg', 'Ingresa correo y contraseña'); return; }
+    btnDoSignup.disabled = true;
+    setLive('suMsg', '');
+    try {
+      const { error } = await sb.auth.signUp({ email, password: pass });
+      if (error) throw error;
+      setLive('suMsg', 'Revisa tu correo para confirmar la cuenta.');
+    } catch (err) {
+      console.error('Signup error', err);
+      setLive('suMsg', err.message || 'No se pudo crear la cuenta');
+      btnDoSignup.disabled = false;
+    }
+  });
+
+  // Reset password
+  btnForgot?.addEventListener('click', async () => {
+    const email = $('#liEmail')?.value.trim();
+    if (!email) { setLive('liMsg', 'Ingresa tu correo para continuar'); return; }
+    btnForgot.disabled = true;
+    setLive('liMsg', '');
+    try {
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+      if (error) throw error;
+      setLive('liMsg', 'Revisa tu correo para restablecer la contraseña.');
+    } catch (err) {
+      console.error('Reset error', err);
+      setLive('liMsg', err.message || 'No se pudo enviar el correo');
+    } finally {
+      btnForgot.disabled = false;
+    }
+  });
+
+  // Si ya hay sesión, ir directo al app
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session && !$('#hub')) location.href = '/app.html';
+  });
 });
 
-// Carga inicial y guard de auth
-document.addEventListener('DOMContentLoaded', async()=>{
-  const { data:{ session } } = await sb.auth.getSession();
-  if(!session){ location.href='/'; return; }
+// Carga inicial y guard de auth para app
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!$('#hub')) return; // solo en app.html
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = '/'; return; }
   user = session.user;
   await loadGoals();
   await loadMealsToday();
