@@ -10,81 +10,84 @@
 </head>
 <body>
   <header class="topbar" role="banner">
-    <div class="brand">Prouti</div>
+    <a id="navToHub" class="brand" href="#hub">Prouti</a>
     <nav class="menu" aria-label="Navegación principal">
-      <a class="chip" href="#goals">Calcula tus macros</a>
-      <a class="chip" href="#meals">Registra tus comidas</a>
-      <a class="chip" href="#progress">Mide tu avance</a>
+      <button id="navToGoals" class="chip" type="button">Metas</button>
+      <button id="navToMeals" class="chip" type="button">Comidas</button>
+      <button id="navToProgress" class="chip" type="button">Progreso</button>
     </nav>
     <div class="user-menu">
-      <span id="userEmail" class="chip" aria-live="polite"></span>
       <button id="btnLogout" class="chip" type="button">Cerrar sesión</button>
     </div>
   </header>
 
-  <main class="wrap">
-    <section id="summary" aria-labelledby="hSummary">
-      <h2 id="hSummary">Resumen de hoy</h2>
-      <div id="summaryCards" class="grid stats">
-        <article class="stat-card skeleton">
-          <p class="stat-label">Calorías</p>
-          <p class="stat-value"><span id="sumKcal">0</span> / <span id="goalKcal">0</span> kcal</p>
+  <main>
+    <section id="hub" class="section">
+      <div class="hub-grid">
+        <article class="hub-card card">
+          <h2>Calcula tus macros</h2>
+          <p id="statGoals" class="quick-stat skeleton">…</p>
+          <button id="ctaGoGoals" class="btn btn-primary" type="button">Ir a metas</button>
         </article>
-        <article class="stat-card skeleton">
-          <p class="stat-label">Proteína</p>
-          <p class="stat-value"><span id="sumProt">0</span> / <span id="goalProt">0</span> g</p>
+        <article class="hub-card card">
+          <h2>Registra tus comidas</h2>
+          <p id="statMeals" class="quick-stat skeleton">…</p>
+          <button id="ctaGoMeals" class="btn btn-primary" type="button">Ir a comidas</button>
         </article>
-        <article class="stat-card skeleton">
-          <p class="stat-label">Carbos</p>
-          <p class="stat-value"><span id="sumCarb">0</span> / <span id="goalCarb">0</span> g</p>
-        </article>
-        <article class="stat-card skeleton">
-          <p class="stat-label">Grasas</p>
-          <p class="stat-value"><span id="sumFat">0</span> / <span id="goalFat">0</span> g</p>
+        <article class="hub-card card">
+          <h2>Mide tu avance</h2>
+          <p id="statProgress" class="quick-stat skeleton">…</p>
+          <button id="ctaGoProgress" class="btn btn-primary" type="button">Ver progreso</button>
         </article>
       </div>
-      <p id="summaryTime" class="muted" aria-live="polite"></p>
     </section>
 
-    <section id="goals" aria-labelledby="hGoals">
+    <section id="goals" class="section hide" aria-labelledby="hGoals">
       <h2 id="hGoals">Metas</h2>
       <div class="card">
-        <form id="formGoals" class="grid goal-grid" autocomplete="off">
+        <form class="grid" autocomplete="off">
           <div>
-            <label for="metaKcal">Calorías objetivo</label>
-            <input id="metaKcal" type="number" inputmode="numeric" min="0" placeholder="2000" />
+            <label for="metaKcal">Calorías (kcal)</label>
+            <input id="metaKcal" type="number" inputmode="numeric" min="0" />
           </div>
           <div>
             <label for="metaProt">Proteína (g)</label>
-            <input id="metaProt" type="number" inputmode="numeric" min="0" placeholder="150" />
+            <input id="metaProt" type="number" inputmode="numeric" min="0" />
           </div>
           <div>
             <label for="metaCarb">Carbos (g)</label>
-            <input id="metaCarb" type="number" inputmode="numeric" min="0" placeholder="200" />
+            <input id="metaCarb" type="number" inputmode="numeric" min="0" />
           </div>
           <div>
-            <label for="metaGrasa">Grasas (g)</label>
-            <input id="metaGrasa" type="number" inputmode="numeric" min="0" placeholder="70" />
+            <label for="metaFat">Grasas (g)</label>
+            <input id="metaFat" type="number" inputmode="numeric" min="0" />
           </div>
           <div class="actions">
             <button id="btnSaveGoals" class="btn btn-primary" type="button">Guardar metas</button>
           </div>
         </form>
-        <p id="goalMsg" class="muted" role="status" aria-live="polite"></p>
+        <p id="msgGoals" class="muted" aria-live="polite"></p>
       </div>
     </section>
 
-    <section id="meals" aria-labelledby="hMeals">
+    <section id="meals" class="section hide" aria-labelledby="hMeals">
       <h2 id="hMeals">Comidas</h2>
+      <div id="todaySummary" class="card">
+        <div class="progress-row skeleton"><span>Calorías</span><div class="bar"><div class="fill" style="width:0%"></div></div><span>0/0</span></div>
+      </div>
       <div class="card">
-        <form id="formMeal" class="grid meal-grid" autocomplete="off">
+        <form class="grid meal-grid" autocomplete="off">
           <div class="wide">
             <label for="mealName">Nombre</label>
-            <input id="mealName" type="text" placeholder="Pechuga de pollo" autocomplete="off" />
+            <input id="mealName" type="text" autocomplete="off" />
           </div>
           <div>
             <label for="mealQty">Cantidad (g)</label>
             <input id="mealQty" type="number" step="1" min="0" value="100" />
+          </div>
+          <div>
+            <label for="mealKcal">Calorías</label>
+            <input id="mealKcal" type="number" step="1" min="0" />
           </div>
           <div>
             <label for="mealProt">Proteína (g)</label>
@@ -98,32 +101,29 @@
             <label for="mealFat">Grasas (g)</label>
             <input id="mealFat" type="number" step="0.1" min="0" />
           </div>
-          <div>
-            <label for="mealKcal">o Calorías</label>
-            <input id="mealKcal" type="number" step="1" min="0" />
-          </div>
           <div class="actions">
             <button id="btnAddMeal" class="btn btn-primary" type="button">Agregar</button>
           </div>
         </form>
-        <p id="mealMsg" class="muted" role="status" aria-live="polite"></p>
+        <p id="msgMeals" class="muted" aria-live="polite"></p>
       </div>
       <div class="card table-card">
         <table class="table" aria-label="Comidas de hoy">
           <thead>
-            <tr><th>Hora</th><th>Comida</th><th>Kcal</th><th>P</th><th>C</th><th>G</th><th></th></tr>
+            <tr><th>Comida</th><th>Kcal</th><th>P</th><th>C</th><th>G</th><th></th></tr>
           </thead>
-          <tbody id="mealTable"></tbody>
+          <tbody id="mealsTbody"></tbody>
         </table>
         <button id="btnMoreMeals" class="btn btn-soft hide" type="button">Ver más</button>
       </div>
     </section>
 
-    <section id="progress" aria-labelledby="hProgress">
+    <section id="progress" class="section hide" aria-labelledby="hProgress">
       <h2 id="hProgress">Progreso</h2>
       <div class="card">
-        <div id="progressChart" class="progress-chart" aria-label="Gráfica de progreso"></div>
-        <p id="progressMsg" class="muted">Registra tus comidas para ver tu progreso.</p>
+        <div id="kpiCompliance" class="kpi skeleton">0%</div>
+        <div id="chartArea" class="chart-area"></div>
+        <p id="msgProgress" class="muted" aria-live="polite"></p>
       </div>
     </section>
   </main>
