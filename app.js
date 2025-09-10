@@ -1,48 +1,62 @@
 // Helpers
-const $ = id => document.getElementById(id);
+const $ = (id)=>document.getElementById(id);
 const show = id => $(id)?.classList.remove('hide');
 const hide = id => $(id)?.classList.add('hide');
 const setText = (id,v)=>{ const el=$(id); if(el) el.textContent = String(v ?? ''); };
 const todayStr = ()=> new Date().toISOString().slice(0,10);
 
-// Modals with focus trap
-const FOCUSABLE = 'a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])';
-let lastFocus = null;
 function openModal(id){
-  const m = $(id); if(!m) return;
-  lastFocus = document.activeElement;
-  m.classList.remove('hide');
+  const el = $(id); if(!el) return;
+  el.classList.remove('hide');
   document.body.style.overflow = 'hidden';
-  const focusables = m.querySelectorAll(FOCUSABLE);
-  focusables[0]?.focus();
-  m._trap = e=>{
-    if(e.key === 'Escape'){ closeModal(id); }
-    else if(e.key === 'Tab' && focusables.length){
-      const first = focusables[0];
-      const last = focusables[focusables.length-1];
-      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
-    }
-  };
-  m.addEventListener('keydown', m._trap);
-  m._backdrop = e=>{ if(e.target === m) closeModal(id); };
-  m.addEventListener('click', m._backdrop);
+  const first = el.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
+  if(first) setTimeout(()=> first.focus(), 0);
 }
 function closeModal(id){
-  const m = $(id); if(!m) return;
-  m.classList.add('hide');
+  const el = $(id); if(!el) return;
+  el.classList.add('hide');
   document.body.style.overflow = '';
-  m.removeEventListener('keydown', m._trap);
-  m.removeEventListener('click', m._backdrop);
-  lastFocus?.focus();
 }
+
+function wireModalDismiss(){
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape'){
+      ['loginModal','signupModal'].forEach(m => {
+        const el = $(m);
+        if(el && !el.classList.contains('hide')) closeModal(m);
+      });
+    }
+  });
+  ['loginModal','signupModal'].forEach(m=>{
+    const el=$(m);
+    if(!el) return;
+    el.addEventListener('click', (e)=>{
+      if(e.target.closest('.modal-card')) return;
+      closeModal(m);
+    });
+  });
+}
+
 function wireAuthButtons(){
-  $('btnOpenLogin')?.addEventListener('click',()=>openModal('loginModal'));
-  $('btnOpenSignup')?.addEventListener('click',()=>openModal('signupModal'));
-  $('btnCloseLogin')?.addEventListener('click',()=>closeModal('loginModal'));
-  $('btnCloseSignup')?.addEventListener('click',()=>closeModal('signupModal'));
+  const L=$('btnOpenLogin'), S=$('btnOpenSignup');
+  if(L) L.onclick = ()=> openModal('loginModal');
+  if(S) S.onclick = ()=> openModal('signupModal');
+
+  const CL=$('btnCloseLogin'), CS=$('btnCloseSignup');
+  if(CL) CL.onclick = ()=> closeModal('loginModal');
+  if(CS) CS.onclick = ()=> closeModal('signupModal');
 }
+
+function maybeOpenModalFromQuery(){
+  const q = new URLSearchParams(location.search);
+  const m = q.get('modal');
+  if(m === 'login') openModal('loginModal');
+  if(m === 'signup') openModal('signupModal');
+}
+
 wireAuthButtons();
+wireModalDismiss();
+maybeOpenModalFromQuery();
 
 // Supabase client
 const { createClient } = supabase;
