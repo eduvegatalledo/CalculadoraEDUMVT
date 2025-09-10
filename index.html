@@ -1,18 +1,20 @@
+<!-- Landing pública de Prouti con acceso (login/registro) -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ProteeMVT — Nutrición simple, progreso real</title>
+  <title>Prouti — Nutrición simple, progreso real</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
 
   <section class="hero" aria-labelledby="landingTitle">
-    <div class="wrap" style="min-height:100vh;display:grid;place-content:center;text-align:center">
-      <h1 id="landingTitle">Nutrición simple, progreso real</h1>
-      <p class="muted">Calcula tus macros, registra tus comidas y mide tu avance.</p>
-      <aside class="card" style="margin-top:20px">
+    <div class="wrap hero-grid hero-pad center">
+      <h1 id="landingTitle" class="display">Nutrición simple, progreso real</h1>
+      <p class="subbrand">Prouti</p>
+      <p class="lead">Calcula tus macros, registra lo que comes y mide tu avance.</p>
+      <aside class="card access-card" style="margin-top:20px">
         <div class="stack-10">
           <button id="btnOpenLogin" class="btn btn-primary" type="button">Iniciar sesión</button>
           <button id="btnOpenSignup" class="btn btn-soft" type="button">Regístrate</button>
@@ -21,11 +23,9 @@
     </div>
   </section>
 
-  <main id="main" class="hide"></main>
-
   <!-- MODALES: Signup / Login -->
   <div id="signupModal" class="hide" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
-    <section class="wrap" style="position:fixed; inset:0; display:grid; place-items:center; background:rgba(2,16,13,.22)">
+    <section class="wrap modal-backdrop">
       <div class="card" style="max-width:460px;width:100%">
         <h2 id="signupTitle">Crear cuenta</h2>
         <div class="stack-12" style="margin-top:8px">
@@ -38,7 +38,7 @@
             <input id="suPass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
           </div>
         </div>
-        <p id="suMsg" class="muted" style="margin-top:8px" role="status" aria-live="polite"></p>
+        <p id="suMsg" class="muted" role="status" aria-live="polite" style="margin-top:8px"></p>
         <div class="row" style="margin-top:12px;justify-content:flex-end">
           <button id="btnCloseSignup" class="btn" type="button">Cancelar</button>
           <button id="btnDoSignup" class="btn btn-primary" type="button">Crear cuenta</button>
@@ -48,7 +48,7 @@
   </div>
 
   <div id="loginModal" class="hide" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-    <section class="wrap" style="position:fixed; inset:0; display:grid; place-items:center; background:rgba(2,16,13,.22)">
+    <section class="wrap modal-backdrop">
       <div class="card" style="max-width:460px;width:100%">
         <h2 id="loginTitle">Iniciar sesión</h2>
         <div class="stack-12" style="margin-top:8px">
@@ -61,7 +61,7 @@
             <input id="liPass" type="password" placeholder="Tu contraseña" autocomplete="current-password" />
           </div>
         </div>
-        <p id="liMsg" class="muted" style="margin-top:8px" role="status" aria-live="polite"></p>
+        <p id="liMsg" class="muted" role="status" aria-live="polite" style="margin-top:8px"></p>
         <div class="row" style="margin-top:12px;justify-content:space-between">
           <button id="btnForgot" class="btn btn-soft" type="button">Olvidé mi contraseña</button>
           <div>
@@ -74,7 +74,7 @@
   </div>
 
   <footer class="wrap" aria-label="Información legal">
-    <p class="muted">© <span id="year"></span> ProteeMVT. Todos los derechos reservados.</p>
+    <p class="muted">© <span id="year"></span> Prouti. Todos los derechos reservados.</p>
   </footer>
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>

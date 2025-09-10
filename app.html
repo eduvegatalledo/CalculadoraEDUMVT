@@ -1,53 +1,49 @@
+<!-- Panel privado de Prouti post-login -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ProteeMVT — Panel</title>
+  <title>Prouti — Panel</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-
 <header id="topbar" class="hide" role="banner">
   <div class="tb">
-    <div class="brand" aria-label="ProteeMVT"></div>
-    <div class="tb-actions">
-      <span id="userBadge" class="badge-email" aria-live="polite"></span>
-      <button id="btnProfile" class="btn btn-soft" type="button" aria-haspopup="dialog" aria-controls="profileModal">Tu perfil</button>
-      <button id="btnHeaderLogout" class="btn" type="button">Salir</button>
-    </div>
+    <span id="userBadge" class="badge-email" aria-live="polite"></span>
+    <button id="btnHeaderLogout" class="btn" type="button">Salir</button>
   </div>
 </header>
 
 <main id="main" class="hide">
   <nav class="grid-3" aria-label="Secciones principales" style="margin-top:12px">
-    <a class="card" href="#" onclick="showSection('resumen');return false;">🧮 Calcula tus macros</a>
-    <a class="card" href="#" onclick="showSection('comidas');return false;">🍽️ Registra tus comidas</a>
-    <a class="card" href="#" onclick="showSection('progreso');return false;">📈 Mide tu avance</a>
+    <a href="#" class="card" onclick="showSection('metas');return false;">🧮 Calcula tus macros</a>
+    <a href="#" class="card" onclick="showSection('comidas');return false;">🍽️ Registra tus comidas</a>
+    <a href="#" class="card" onclick="showSection('progreso');return false;">📈 Mide tu avance</a>
   </nav>
 
-  <div id="resumen" style="margin-top:20px">
-    <section class="card" style="margin:10px 0">
-      <h3>Resumen de hoy</h3>
-      <p class="muted" id="summaryMsg">Cargando…</p>
-      <div class="grid-3" style="margin-top:10px">
-        <article class="feat-card">
-          <h4>Calorías</h4>
-          <p><b id="sumKcal">0</b> / <span id="goalKcal">0</span> kcal</p>
-        </article>
-        <article class="feat-card">
-          <h4>Proteína</h4>
-          <p><b id="sumProt">0</b> / <span id="goalProt">0</span> g</p>
-        </article>
-        <article class="feat-card">
-          <h4>Carbos / Grasas</h4>
-          <p><b id="sumCarb">0</b> / <span id="goalCarb">0</span> g &nbsp; | &nbsp; <b id="sumFat">0</b> / <span id="goalFat">0</span> g</p>
-        </article>
-      </div>
-    </section>
+  <section id="resumen" style="margin-top:20px">
+    <h2>Resumen de hoy</h2>
+    <p class="muted" id="summaryMsg">Cargando…</p>
+    <div class="grid-3" style="margin-top:10px">
+      <article class="feat-card">
+        <h3>Calorías</h3>
+        <p><b id="sumKcal">0</b> / <span id="goalKcal">0</span> kcal</p>
+      </article>
+      <article class="feat-card">
+        <h3>Proteína</h3>
+        <p><b id="sumProt">0</b> / <span id="goalProt">0</span> g</p>
+      </article>
+      <article class="feat-card">
+        <h3>Carbos / Grasas</h3>
+        <p><b id="sumCarb">0</b> / <span id="goalCarb">0</span> g &nbsp; | &nbsp; <b id="sumFat">0</b> / <span id="goalFat">0</span> g</p>
+      </article>
+    </div>
+  </section>
 
-    <section class="card" style="margin:10px 0">
-      <h3>Definir metas diarias</h3>
+  <section id="metas" class="hide" style="margin-top:20px">
+    <div class="card">
+      <h2>Metas diarias</h2>
       <div class="row" style="gap:12px;margin-top:8px">
         <div><label for="inGoalKcal">Kcal</label><input id="inGoalKcal" type="number" min="0" step="1" placeholder="ej. 2000"></div>
         <div><label for="inGoalProt">Proteína (g)</label><input id="inGoalProt" type="number" min="0" step="1" placeholder="ej. 150"></div>
@@ -55,13 +51,13 @@
         <div><label for="inGoalFat">Grasas (g)</label><input id="inGoalFat" type="number" min="0" step="1" placeholder="ej. 70"></div>
         <div style="align-self:flex-end"><button id="btnSaveGoal" class="btn btn-primary" type="button">Guardar metas</button></div>
       </div>
-      <p id="goalMsg" class="muted" style="margin-top:6px"></p>
-    </section>
-  </div>
+      <p id="goalMsg" class="muted" role="status" aria-live="polite" style="margin-top:6px"></p>
+    </div>
+  </section>
 
-  <div id="comidas" class="hide" style="margin-top:20px">
-    <section class="card">
-      <h3>Agregar comida</h3>
+  <section id="comidas" class="hide" style="margin-top:20px">
+    <div class="card">
+      <h2>Agregar comida</h2>
       <div class="row" style="gap:12px;margin-top:8px">
         <div style="min-width:220px">
           <label for="mealName">Alimento</label>
@@ -77,46 +73,25 @@
         <div><label for="perFat">grasa (g) x porción</label><input id="perFat" type="number" min="0" step="0.1"></div>
         <div style="align-self:flex-end"><button id="btnAddMeal" class="btn btn-primary" type="button">Agregar</button></div>
       </div>
-      <p id="mealMsg" class="muted" style="margin-top:6px"></p>
-    </section>
+      <p id="mealMsg" class="muted" role="status" aria-live="polite" style="margin-top:6px"></p>
+    </div>
 
-    <section class="card" style="margin-top:12px">
-      <h3>Hoy</h3>
+    <div class="card" style="margin-top:12px">
+      <h2>Hoy</h2>
       <div id="mealList" class="stack-10" style="margin-top:8px"></div>
-    </section>
-  </div>
-
-  <div id="progreso" class="hide" style="margin-top:20px">
-    <section class="card"><h3>Pronto: gráficos semanales</h3></section>
-  </div>
-</main>
-
-<div id="profileModal" class="hide" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
-  <section class="wrap" style="position:fixed; inset:0; display:grid; place-items:center; background:rgba(2,16,13,.22)">
-    <div class="card" style="max-width:460px;width:100%">
-      <h2 id="profileTitle">Tu perfil</h2>
-      <p class="muted" style="margin-top:4px">Tu correo y nombre visible dentro de la app.</p>
-      <div class="stack-12" style="margin-top:10px">
-        <div>
-          <label for="profEmail">Correo</label>
-          <input id="profEmail" type="email" disabled />
-        </div>
-        <div>
-          <label for="profName">Nombre visible</label>
-          <input id="profName" type="text" placeholder="Tu nombre" />
-        </div>
-      </div>
-      <div class="row" style="margin-top:12px;justify-content:flex-end">
-        <button id="btnCloseProfile" class="btn" type="button">Cerrar</button>
-        <button id="btnSaveProfile" class="btn btn-primary" type="button">Guardar</button>
-      </div>
-      <p id="profMsg" class="muted" style="margin-top:8px" role="status" aria-live="polite"></p>
     </div>
   </section>
-</div>
+
+  <section id="progreso" class="hide" style="margin-top:20px">
+    <div class="card">
+      <h2>Progreso</h2>
+      <p class="muted">Pronto: gráficos semanales</p>
+    </div>
+  </section>
+</main>
 
 <footer class="wrap" aria-label="Información legal">
-  <p class="muted">© <span id="year"></span> ProteeMVT. Todos los derechos reservados.</p>
+  <p class="muted">© <span id="year"></span> Prouti. Todos los derechos reservados.</p>
 </footer>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>

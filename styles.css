@@ -1,3 +1,4 @@
+/* Estilos globales para Prouti (responsivo y accesible) */
 :root{
   --emerald:#10b981;   /* primario */
   --aqua:#32e6ff;      /* acento */
@@ -25,7 +26,6 @@ body{
 /* Topbar (solo cuando hay sesión) */
 header#topbar{ position:sticky; top:0; z-index:30; }
 .tb{ max-width:1200px; margin:10px auto; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--glass); border:1px solid var(--stroke); border-radius:20px; box-shadow:var(--shadow); }
-.tb-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .badge-email{color:#1c3b33;font-size:13px; opacity:.85}
 
 /* Botones & Inputs */
@@ -56,6 +56,8 @@ input:focus{ border-color:var(--emerald); box-shadow:0 0 0 4px var(--ring); }
 /* Acceso pulcro: sólo dos botones */
 .access-card h2{ margin:0 0 10px; font-size:22px; color:#0e3e34 }
 .access-card .muted{ color:#40675e; font-size:13px; margin:0 0 10px }
+
+.modal-backdrop{position:fixed; inset:0; display:grid; place-items:center; background:rgba(2,16,13,.22)}
 
 /* Tabs / dashboard */
 nav.tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 14px }
