@@ -1,213 +1,134 @@
- codex/generate-static-web-app-files-for-prouti
-<!-- Panel privado de Prouti post-login -->
-<!DOCTYPE html>
-
 <!doctype html>
-<!-- app.html — Panel privado. Requiere sesión. Muestra menú y secciones. -->
-main
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
- codex/generate-static-web-app-files-for-prouti
-  <title>Prouti — Panel</title>
-
   <title>Prouti — Tu panel</title>
   <meta name="theme-color" content="#10b981" />
-main
   <link rel="stylesheet" href="/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Rubik+Rounded:wght@400;500;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
- codex/generate-static-web-app-files-for-prouti
-<header id="topbar" class="hide" role="banner">
-  <div class="tb">
-    <span id="userBadge" class="badge-email" aria-live="polite"></span>
-    <button id="btnHeaderLogout" class="btn" type="button">Salir</button>
-  </div>
-</header>
-
-<main id="main" class="hide">
-  <nav class="grid-3" aria-label="Secciones principales" style="margin-top:12px">
-    <a href="#" class="card" onclick="showSection('metas');return false;">🧮 Calcula tus macros</a>
-    <a href="#" class="card" onclick="showSection('comidas');return false;">🍽️ Registra tus comidas</a>
-    <a href="#" class="card" onclick="showSection('progreso');return false;">📈 Mide tu avance</a>
-  </nav>
-
-  <section id="resumen" style="margin-top:20px">
-    <h2>Resumen de hoy</h2>
-    <p class="muted" id="summaryMsg">Cargando…</p>
-    <div class="grid-3" style="margin-top:10px">
-      <article class="feat-card">
-        <h3>Calorías</h3>
-        <p><b id="sumKcal">0</b> / <span id="goalKcal">0</span> kcal</p>
-      </article>
-      <article class="feat-card">
-        <h3>Proteína</h3>
-        <p><b id="sumProt">0</b> / <span id="goalProt">0</span> g</p>
-      </article>
-      <article class="feat-card">
-        <h3>Carbos / Grasas</h3>
-        <p><b id="sumCarb">0</b> / <span id="goalCarb">0</span> g &nbsp; | &nbsp; <b id="sumFat">0</b> / <span id="goalFat">0</span> g</p>
-      </article>
-    </div>
-  </section>
-
-  <section id="metas" class="hide" style="margin-top:20px">
-    <div class="card">
-      <h2>Metas diarias</h2>
-      <div class="row" style="gap:12px;margin-top:8px">
-        <div><label for="inGoalKcal">Kcal</label><input id="inGoalKcal" type="number" min="0" step="1" placeholder="ej. 2000"></div>
-        <div><label for="inGoalProt">Proteína (g)</label><input id="inGoalProt" type="number" min="0" step="1" placeholder="ej. 150"></div>
-        <div><label for="inGoalCarb">Carbos (g)</label><input id="inGoalCarb" type="number" min="0" step="1" placeholder="ej. 200"></div>
-        <div><label for="inGoalFat">Grasas (g)</label><input id="inGoalFat" type="number" min="0" step="1" placeholder="ej. 70"></div>
-        <div style="align-self:flex-end"><button id="btnSaveGoal" class="btn btn-primary" type="button">Guardar metas</button></div>
-      </div>
-      <p id="goalMsg" class="muted" role="status" aria-live="polite" style="margin-top:6px"></p>
-    </div>
-  </section>
-
-  <section id="comidas" class="hide" style="margin-top:20px">
-    <div class="card">
-      <h2>Agregar comida</h2>
-      <div class="row" style="gap:12px;margin-top:8px">
-        <div style="min-width:220px">
-          <label for="mealName">Alimento</label>
-          <input id="mealName" type="text" placeholder="ej. Pechuga de pollo">
-        </div>
-        <div>
-          <label for="mealQty">Cantidad (porciones)</label>
-          <input id="mealQty" type="number" min="0.1" step="0.1" value="1">
-
-
-  <!-- Topbar -->
-  <header id="topbar" class="hide">
-    <div class="tb">
-      <div class="brand" aria-label="Prouti" style="font-weight:800">Prouti</div>
-      <div class="tb-actions">
-        <span id="userBadge" class="badge-email" aria-live="polite"></span>
-        <button id="btnProfile" class="btn btn-soft" type="button">Tu perfil</button>
-        <button id="btnHeaderLogout" class="btn" type="button">Salir</button>
-      </div>
+  <header class="topbar" role="banner">
+    <div class="brand">Prouti</div>
+    <nav class="menu" aria-label="Navegación principal">
+      <a class="chip" href="#goals">Calcula tus macros</a>
+      <a class="chip" href="#meals">Registra tus comidas</a>
+      <a class="chip" href="#progress">Mide tu avance</a>
+    </nav>
+    <div class="user-menu">
+      <span id="userEmail" class="chip" aria-live="polite"></span>
+      <button id="btnLogout" class="chip" type="button">Cerrar sesión</button>
     </div>
   </header>
 
-  <!-- Panel -->
-  <main class="wrap" id="main">
-    <!-- Menú 3 opciones -->
-    <section class="grid-3" style="margin-top:18px">
-      <button class="feat-card linklike" type="button" onclick="showSection('resumen')">
-        <h3>🧮 Calcula tus macros</h3>
-        <p>Define metas y conviértelas en números diarios.</p>
-      </button>
-      <button class="feat-card linklike" type="button" onclick="showSection('comidas')">
-        <h3>🍽️ Registra tus comidas</h3>
-        <p>Agrega alimentos en segundos y mira los totales.</p>
-      </button>
-      <button class="feat-card linklike" type="button" onclick="showSection('progreso')">
-        <h3>📈 Mide tu avance</h3>
-        <p>Gráficas limpias para sostener el hábito.</p>
-      </button>
+  <main class="wrap">
+    <section id="summary" aria-labelledby="hSummary">
+      <h2 id="hSummary">Resumen de hoy</h2>
+      <div id="summaryCards" class="grid stats">
+        <article class="stat-card skeleton">
+          <p class="stat-label">Calorías</p>
+          <p class="stat-value"><span id="sumKcal">0</span> / <span id="goalKcal">0</span> kcal</p>
+        </article>
+        <article class="stat-card skeleton">
+          <p class="stat-label">Proteína</p>
+          <p class="stat-value"><span id="sumProt">0</span> / <span id="goalProt">0</span> g</p>
+        </article>
+        <article class="stat-card skeleton">
+          <p class="stat-label">Carbos</p>
+          <p class="stat-value"><span id="sumCarb">0</span> / <span id="goalCarb">0</span> g</p>
+        </article>
+        <article class="stat-card skeleton">
+          <p class="stat-label">Grasas</p>
+          <p class="stat-value"><span id="sumFat">0</span> / <span id="goalFat">0</span> g</p>
+        </article>
+      </div>
+      <p id="summaryTime" class="muted" aria-live="polite"></p>
     </section>
 
-    <!-- RESUMEN -->
-    <section id="resumen" style="margin-top:22px">
+    <section id="goals" aria-labelledby="hGoals">
+      <h2 id="hGoals">Metas</h2>
       <div class="card">
-        <h3>Resumen de hoy</h3>
-        <p class="muted" id="summaryMsg">Cargando…</p>
-        <div class="grid-3" style="margin-top:10px">
-          <article class="feat-card">
-            <h4>Calorías</h4>
-            <p><b id="sumKcal">0</b> / <span id="goalKcal">0</span> kcal</p>
-          </article>
-          <article class="feat-card">
-            <h4>Proteína</h4>
-            <p><b id="sumProt">0</b> / <span id="goalProt">0</span> g</p>
-          </article>
-          <article class="feat-card">
-            <h4>Carbos / Grasas</h4>
-            <p><b id="sumCarb">0</b> / <span id="goalCarb">0</span> g &nbsp; | &nbsp;
-               <b id="sumFat">0</b> / <span id="goalFat">0</span> g</p>
-          </article>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <h3>Definir metas diarias</h3>
-        <div class="row" style="gap:12px;margin-top:8px">
-          <div><label for="inGoalKcal">Kcal</label><input id="inGoalKcal" type="number" min="0" step="1" placeholder="ej. 2000"></div>
-          <div><label for="inGoalProt">Proteína (g)</label><input id="inGoalProt" type="number" min="0" step="1" placeholder="ej. 150"></div>
-          <div><label for="inGoalCarb">Carbos (g)</label><input id="inGoalCarb" type="number" min="0" step="1" placeholder="ej. 200"></div>
-          <div><label for="inGoalFat">Grasas (g)</label><input id="inGoalFat" type="number" min="0" step="1" placeholder="ej. 70"></div>
-          <div style="align-self:flex-end"><button id="btnSaveGoal" class="btn btn-primary" type="button">Guardar metas</button></div>
- main
-        </div>
-        <p id="goalMsg" class="muted" style="margin-top:6px"></p>
-      </div>
- codex/generate-static-web-app-files-for-prouti
-      <p id="mealMsg" class="muted" role="status" aria-live="polite" style="margin-top:6px"></p>
-    </div>
-
-    <div class="card" style="margin-top:12px">
-      <h2>Hoy</h2>
-      <div id="mealList" class="stack-10" style="margin-top:8px"></div>
-    </div>
-  </section>
-
-  <section id="progreso" class="hide" style="margin-top:20px">
-    <div class="card">
-      <h2>Progreso</h2>
-      <p class="muted">Pronto: gráficos semanales</p>
-    </div>
-  </section>
-</main>
-
-<footer class="wrap" aria-label="Información legal">
-  <p class="muted">© <span id="year"></span> Prouti. Todos los derechos reservados.</p>
-</footer>
-
-    </section>
-
-    <!-- COMIDAS -->
-    <section id="comidas" class="hide" style="margin-top:22px">
-      <div class="card">
-        <h3>Agregar comida</h3>
-        <div class="row" style="gap:12px;margin-top:8px">
-          <div style="min-width:220px">
-            <label for="mealName">Alimento</label>
-            <input id="mealName" type="text" placeholder="ej. Pechuga de pollo">
+        <form id="formGoals" class="grid goal-grid" autocomplete="off">
+          <div>
+            <label for="metaKcal">Calorías objetivo</label>
+            <input id="metaKcal" type="number" inputmode="numeric" min="0" placeholder="2000" />
           </div>
           <div>
-            <label for="mealQty">Cantidad (porciones)</label>
-            <input id="mealQty" type="number" min="0.1" step="0.1" value="1">
+            <label for="metaProt">Proteína (g)</label>
+            <input id="metaProt" type="number" inputmode="numeric" min="0" placeholder="150" />
           </div>
-          <div><label for="perKcal">kcal x porción</label><input id="perKcal" type="number" min="0" step="1"></div>
-          <div><label for="perProt">prot (g) x porción</label><input id="perProt" type="number" min="0" step="0.1"></div>
-          <div><label for="perCarb">carb (g) x porción</label><input id="perCarb" type="number" min="0" step="0.1"></div>
-          <div><label for="perFat">grasa (g) x porción</label><input id="perFat" type="number" min="0" step="0.1"></div>
-          <div style="align-self:flex-end"><button id="btnAddMeal" class="btn btn-primary" type="button">Agregar</button></div>
-        </div>
-        <p id="mealMsg" class="muted" style="margin-top:6px"></p>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <h3>Hoy</h3>
-        <div id="mealList" class="stack-10" style="margin-top:8px"></div>
+          <div>
+            <label for="metaCarb">Carbos (g)</label>
+            <input id="metaCarb" type="number" inputmode="numeric" min="0" placeholder="200" />
+          </div>
+          <div>
+            <label for="metaGrasa">Grasas (g)</label>
+            <input id="metaGrasa" type="number" inputmode="numeric" min="0" placeholder="70" />
+          </div>
+          <div class="actions">
+            <button id="btnSaveGoals" class="btn btn-primary" type="button">Guardar metas</button>
+          </div>
+        </form>
+        <p id="goalMsg" class="muted" role="status" aria-live="polite"></p>
       </div>
     </section>
 
-    <!-- PROGRESO -->
-    <section id="progreso" class="hide" style="margin-top:22px">
-      <div class="card"><h3>Pronto: gráficos semanales</h3></div>
+    <section id="meals" aria-labelledby="hMeals">
+      <h2 id="hMeals">Comidas</h2>
+      <div class="card">
+        <form id="formMeal" class="grid meal-grid" autocomplete="off">
+          <div class="wide">
+            <label for="mealName">Nombre</label>
+            <input id="mealName" type="text" placeholder="Pechuga de pollo" autocomplete="off" />
+          </div>
+          <div>
+            <label for="mealQty">Cantidad (g)</label>
+            <input id="mealQty" type="number" step="1" min="0" value="100" />
+          </div>
+          <div>
+            <label for="mealProt">Proteína (g)</label>
+            <input id="mealProt" type="number" step="0.1" min="0" />
+          </div>
+          <div>
+            <label for="mealCarb">Carbos (g)</label>
+            <input id="mealCarb" type="number" step="0.1" min="0" />
+          </div>
+          <div>
+            <label for="mealFat">Grasas (g)</label>
+            <input id="mealFat" type="number" step="0.1" min="0" />
+          </div>
+          <div>
+            <label for="mealKcal">o Calorías</label>
+            <input id="mealKcal" type="number" step="1" min="0" />
+          </div>
+          <div class="actions">
+            <button id="btnAddMeal" class="btn btn-primary" type="button">Agregar</button>
+          </div>
+        </form>
+        <p id="mealMsg" class="muted" role="status" aria-live="polite"></p>
+      </div>
+      <div class="card table-card">
+        <table class="table" aria-label="Comidas de hoy">
+          <thead>
+            <tr><th>Hora</th><th>Comida</th><th>Kcal</th><th>P</th><th>C</th><th>G</th><th></th></tr>
+          </thead>
+          <tbody id="mealTable"></tbody>
+        </table>
+        <button id="btnMoreMeals" class="btn btn-soft hide" type="button">Ver más</button>
+      </div>
+    </section>
+
+    <section id="progress" aria-labelledby="hProgress">
+      <h2 id="hProgress">Progreso</h2>
+      <div class="card">
+        <div id="progressChart" class="progress-chart" aria-label="Gráfica de progreso"></div>
+        <p id="progressMsg" class="muted">Registra tus comidas para ver tu progreso.</p>
+      </div>
     </section>
   </main>
 
-  <footer class="wrap" aria-label="Información legal">
-    <p class="muted">© <span id="year"></span> Prouti. Todos los derechos reservados.</p>
-  </footer>
- main
-
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script src="/app.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
+  <script src="/app.js" defer></script>
 </body>
 </html>
