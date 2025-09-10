@@ -6,57 +6,29 @@ const setText = (id,v)=>{ const el=$(id); if(el) el.textContent = String(v ?? ''
 const todayStr = ()=> new Date().toISOString().slice(0,10);
 
 function openModal(id){
-  const el = $(id); if(!el) return;
-  el.classList.remove('hide');
-  document.body.style.overflow = 'hidden';
-  const first = el.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
-  if(first) setTimeout(()=> first.focus(), 0);
+  const el=$(id); if(!el) return; el.classList.remove('hide'); document.body.style.overflow='hidden';
+  const first = el.querySelector('input,button,[tabindex]:not([tabindex="-1"])'); if(first) setTimeout(()=>first.focus(),0);
 }
 function closeModal(id){
-  const el = $(id); if(!el) return;
-  el.classList.add('hide');
-  document.body.style.overflow = '';
+  const el=$(id); if(!el) return; el.classList.add('hide'); document.body.style.overflow='';
 }
-
-function wireModalDismiss(){
-  document.addEventListener('keydown', (e)=>{
-    if(e.key === 'Escape'){
-      ['loginModal','signupModal'].forEach(m => {
-        const el = $(m);
-        if(el && !el.classList.contains('hide')) closeModal(m);
-      });
-    }
-  });
-  ['loginModal','signupModal'].forEach(m=>{
-    const el=$(m);
-    if(!el) return;
-    el.addEventListener('click', (e)=>{
-      if(e.target.closest('.modal-card')) return;
-      closeModal(m);
-    });
-  });
-}
-
 function wireAuthButtons(){
-  const L=$('btnOpenLogin'), S=$('btnOpenSignup');
-  if(L) L.onclick = ()=> openModal('loginModal');
-  if(S) S.onclick = ()=> openModal('signupModal');
-
-  const CL=$('btnCloseLogin'), CS=$('btnCloseSignup');
-  if(CL) CL.onclick = ()=> closeModal('loginModal');
-  if(CS) CS.onclick = ()=> closeModal('signupModal');
+  $('btnOpenLogin')?.addEventListener('click', ()=>openModal('loginModal'));
+  $('btnOpenSignup')?.addEventListener('click',()=>openModal('signupModal'));
+  $('btnCloseLogin')?.addEventListener('click', ()=>closeModal('loginModal'));
+  $('btnCloseSignup')?.addEventListener('click',()=>closeModal('signupModal'));
 }
-
-function maybeOpenModalFromQuery(){
-  const q = new URLSearchParams(location.search);
-  const m = q.get('modal');
-  if(m === 'login') openModal('loginModal');
-  if(m === 'signup') openModal('signupModal');
+function wireModalDismiss(){
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ ['loginModal','signupModal'].forEach(id=>{ const el=$(id); if(el && !el.classList.contains('hide')) closeModal(id); }) } });
+  ['loginModal','signupModal'].forEach(id=>{
+    const el=$(id); el?.addEventListener('click', e=>{ if(!e.target.closest('.modal-card')) closeModal(id); });
+  });
 }
-
-wireAuthButtons();
-wireModalDismiss();
-maybeOpenModalFromQuery();
+wireAuthButtons(); wireModalDismiss();
+const q = new URLSearchParams(location.search);
+const m = q.get('modal'); // 'login' | 'signup'
+if(m==='login')  openModal('loginModal');
+if(m==='signup') openModal('signupModal');
 
 // Supabase client
 const { createClient } = supabase;
