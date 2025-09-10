@@ -31,10 +31,27 @@ function closeModal(id){
 const todayStr = () => new Date().toISOString().slice(0,10);
 
 // Supabase
-const { createClient } = supabase;
-const SUPABASE_URL = "https://nzzzeycpfdtvzphbupbf.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56enpleWNwZmR0dnpwaGJ1cGJmIiwi\ncm9sZSI6ImFub24iLCJpYXQiOjE3NTc0NDA3MTIsImV4cCI6MjA3MzAxNjcxMn0.HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44";
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+(function initSupabaseClient(){
+  const url = (window.SUPABASE_URL || '').trim();
+  const key = (window.SUPABASE_ANON_KEY || '').trim();
+
+  function isValidUrl(u){ try{ const x=new URL(u); return x.protocol==='https:'; }catch{ return false; } }
+
+  if(!url || !key){
+    console.error('[ENV] Faltan SUPABASE_URL o SUPABASE_ANON_KEY.', { hasUrl: !!url, hasKey: !!key });
+    throw new Error('Configuración inválida: faltan credenciales públicas de Supabase.');
+  }
+  if(!isValidUrl(url)){
+    console.error('[ENV] URL inválida para Supabase:', url);
+    throw new Error('SUPABASE_URL inválida. Debe ser una URL HTTPS válida.');
+  }
+
+  // log de diagnóstico no sensible
+  console.info('[Supabase] host:', new URL(url).host, 'keyLen:', key.length);
+
+  window.sb = window.sb || supabase.createClient(url, key);
+})();
+const sb = window.sb;
 
 // SPA helpers
 const sections = ['hub','goals','meals','progress'];
@@ -52,7 +69,7 @@ $('#navToMeals')?.addEventListener('click', () => show('meals'));
 $('#ctaGoMeals')?.addEventListener('click', () => show('meals'));
 $('#navToProgress')?.addEventListener('click', () => show('progress'));
 $('#ctaGoProgress')?.addEventListener('click', () => show('progress'));
-$('#btnLogout')?.addEventListener('click', async()=>{ await sb.auth.signOut(); location.href='/'; });
+$('#btnLogout')?.addEventListener('click', async()=>{ await window.sb.auth.signOut(); location.href='/'; });
 $('#btnSaveGoals')?.addEventListener('click', saveGoals);
 $('#btnAddMeal')?.addEventListener('click', addMeal);
 $('#mealsTbody')?.addEventListener('click',e=>{
@@ -62,83 +79,56 @@ $('#mealsTbody')?.addEventListener('click',e=>{
 $('#btnMoreMeals')?.addEventListener('click', ()=>{ mealPage++; loadMealsToday(false); });
 
 // Landing: manejo de modales y auth
-document.addEventListener('DOMContentLoaded', () => {
-  // Abrir modales sólo por clic
-  $('btnOpenLogin')?.addEventListener('click', () => openModal('loginModal'));
-  $('btnOpenSignup')?.addEventListener('click', () => openModal('signupModal'));
-  $('btnCloseLogin')?.addEventListener('click', () => closeModal('loginModal'));
-  $('btnCloseSignup')?.addEventListener('click', () => closeModal('signupModal'));
+document.addEventListener('DOMContentLoaded', ()=>{
+  $('btnOpenLogin')?.addEventListener('click', ()=>openModal?.('loginModal'));
+  $('btnOpenSignup')?.addEventListener('click',()=>openModal?.('signupModal'));
+  $('btnCloseLogin')?.addEventListener('click', ()=>closeModal('loginModal'));
+  $('btnCloseSignup')?.addEventListener('click', ()=>closeModal('signupModal'));
 
-  // LOGIN
   $('btnDoLogin')?.addEventListener('click', onDoLogin);
   async function onDoLogin(e){
     e.preventDefault();
-    console.log('Login click');
     const email = $('liEmail')?.value?.trim();
-    const password = $('liPass')?.value || '';
+    const password = $('liPass')?.value||'';
     if(!email || !password){ setLive('msgLogin','Ingresa correo y contraseña.'); return; }
-    const btn = $('btnDoLogin'); btn.disabled = true; setLive('msgLogin','Ingresando...');
+    const btn=$('btnDoLogin'); btn.disabled=true; setLive('msgLogin','Ingresando…');
     try{
-      console.log('signInWithPassword start');
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      console.log('signInWithPassword result', { data, error });
-      if(error){ console.error('Login error:', { name:error.name, message:error.message, status:error.status }); setLive('msgLogin', error.message || 'No pudimos iniciar sesión.'); btn.disabled = false; return; }
-      console.log('Login session', data.session);
+      const { data, error } = await window.sb.auth.signInWithPassword({ email, password });
+      if(error){ console.error('[Login]',error); setLive('msgLogin', error.message||'No pudimos iniciar sesión.'); btn.disabled=false; return; }
       setLive('msgLogin','Sesión iniciada. Redirigiendo…');
-      window.location.href = '/app.html';
+      location.href='/app.html';
     }catch(err){
-      console.error('Login unexpected:', err);
-      setLive('msgLogin','Error inesperado. Intenta de nuevo.');
-      btn.disabled = false;
+      console.error('[Login unexpected]', err); setLive('msgLogin','Error inesperado.'); btn.disabled=false;
     }
   }
 
-  // SIGNUP
   $('btnDoSignup')?.addEventListener('click', async (e)=>{
     e.preventDefault();
-    const email = $('siEmail')?.value?.trim();
-    const password = $('siPass')?.value || '';
-    const msgId = 'msgSignup';
-    if(!email || !password){ setLive(msgId,'Completa correo y contraseña.'); return; }
-    const btn = $('btnDoSignup'); btn.disabled = true; setLive(msgId,'Creando cuenta…');
+    const email=$('siEmail')?.value?.trim(), password=$('siPass')?.value||'';
+    if(!email||!password){ setLive('msgSignup','Completa correo y contraseña.'); return; }
+    const btn=$('btnDoSignup'); btn.disabled=true; setLive('msgSignup','Creando cuenta…');
     try{
-      const { data, error } = await sb.auth.signUp({ email, password });
-      if(error){ console.error('Signup error:', error); setLive(msgId, error.message || 'No pudimos crear tu cuenta.'); btn.disabled = false; return; }
-      setLive(msgId,'Cuenta creada. Revisa tu correo para confirmar.');
-      btn.disabled = false;
-    }catch(err){
-      console.error('Signup unexpected:', err);
-      setLive(msgId,'Error inesperado. Intenta de nuevo.');
-      btn.disabled = false;
-    }
+      const { data, error } = await window.sb.auth.signUp({ email, password });
+      if(error){ console.error('[Signup]',error); setLive('msgSignup', error.message||'No pudimos crear tu cuenta.'); btn.disabled=false; return; }
+      setLive('msgSignup','Cuenta creada. Revisa tu correo para confirmar.');
+      btn.disabled=false;
+    }catch(err){ console.error('[Signup unexpected]',err); setLive('msgSignup','Error inesperado.'); btn.disabled=false; }
   });
 
-  // RESET PASSWORD (si existe)
   $('btnForgot')?.addEventListener('click', async (e)=>{
     e.preventDefault();
-    const email = $('liEmail')?.value?.trim();
-    const msgId = 'msgLogin';
-    if(!email){ setLive(msgId,'Ingresa tu correo.'); return; }
-    const btn = $('btnForgot'); btn.disabled = true; setLive(msgId,'Enviando enlace…');
+    const email=$('liEmail')?.value?.trim(); if(!email){ setLive('msgLogin','Ingresa tu correo.'); return; }
+    const btn=$('btnForgot'); btn.disabled=true; setLive('msgLogin','Enviando enlace…');
     try{
-      const { data, error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/reset.html' });
-      if(error){ console.error('Reset error:', error); setLive(msgId, error.message || 'No se pudo enviar el enlace.'); btn.disabled = false; return; }
-      setLive(msgId,'Te enviamos un enlace para restablecer tu contraseña.');
-      btn.disabled = false;
-    }catch(err){
-      console.error('Reset unexpected:', err);
-      setLive(msgId,'Error inesperado. Intenta de nuevo.');
-      btn.disabled = false;
-    }
+      const { error } = await window.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin+'/reset.html' });
+      if(error){ console.error('[Reset]',error); setLive('msgLogin', error.message||'No se pudo enviar el enlace.'); btn.disabled=false; return; }
+      setLive('msgLogin','Te enviamos un enlace para restablecer tu contraseña.');
+      btn.disabled=false;
+    }catch(err){ console.error('[Reset unexpected]',err); setLive('msgLogin','Error inesperado.'); btn.disabled=false; }
   });
 
-  // Abrir modal desde query string
-  const modalParam = new URLSearchParams(window.location.search).get('modal');
-  if(modalParam === 'login' || modalParam === 'signup') openModal(`${modalParam}Modal`);
-
-  // Si ya hay sesión, ir directo al app
-  sb.auth.getSession().then(({ data: { session } }) => {
-    if (session && !$('#hub')) window.location.href = '/app.html';
+  window.sb.auth.getSession().then(({ data:{ session } })=>{
+    if(session && !$('#hub')) location.href='/app.html';
   });
 });
 
@@ -146,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', async () => {
   if (!$('#hub')) return; // solo en app.html
   try{
-    const { data: { session } } = await sb.auth.getSession();
+    const { data: { session } } = await window.sb.auth.getSession();
     if(!session){
       window.location.replace('/');
       return;
@@ -157,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadCompliance7d();
     show('hub');
   }catch(err){
-    console.error('Auth guard error:', err);
+    console.error('[Guard]', err);
     window.location.replace('/');
   }
 });
