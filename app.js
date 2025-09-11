@@ -31,10 +31,34 @@ function closeModal(id){
 const todayStr = () => new Date().toISOString().slice(0,10);
 
 // Supabase
+codex/remove-__env-script-block
+(function initSupabaseClient(){
+  const url = 'https://nzzzeycpfdtvzphbupbf.supabase.co';
+  const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56enpleWNwZmR0dnpwaGJ1cGJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0NDA3MTIsImV4cCI6MjA3MzAxNjcxMn0.HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44';
+
+  function isValidUrl(u){ try{ const x=new URL(u); return x.protocol==='https:'; }catch{ return false; } }
+
+  if(!url || !key){
+    console.error('[ENV] Faltan credenciales de Supabase.', { hasUrl: !!url, hasKey: !!key });
+    throw new Error('Configuración inválida: faltan credenciales públicas de Supabase.');
+  }
+  if(!isValidUrl(url)){
+    console.error('[ENV] URL inválida para Supabase:', url);
+    throw new Error('URL de Supabase inválida. Debe ser una URL HTTPS válida.');
+  }
+
+  // log de diagnóstico no sensible
+  console.info('[Supabase] host:', new URL(url).host, 'keyLen:', key.length);
+
+  window.sb = window.sb || supabase.createClient(url, key);
+})();
+const sb = window.sb;
+=======
 const sb = supabase.createClient(
   'https://nzzzeycpfdtvzphbupbf.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44'
 );
+main
 
 // SPA helpers
 const sections = ['hub','goals','meals','progress'];
