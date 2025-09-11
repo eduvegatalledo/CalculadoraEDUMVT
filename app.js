@@ -31,27 +31,10 @@ function closeModal(id){
 const todayStr = () => new Date().toISOString().slice(0,10);
 
 // Supabase
-(function initSupabaseClient(){
-  const url = (window.SUPABASE_URL || '').trim();
-  const key = (window.SUPABASE_ANON_KEY || '').trim();
-
-  function isValidUrl(u){ try{ const x=new URL(u); return x.protocol==='https:'; }catch{ return false; } }
-
-  if(!url || !key){
-    console.error('[ENV] Faltan SUPABASE_URL o SUPABASE_ANON_KEY.', { hasUrl: !!url, hasKey: !!key });
-    throw new Error('Configuración inválida: faltan credenciales públicas de Supabase.');
-  }
-  if(!isValidUrl(url)){
-    console.error('[ENV] URL inválida para Supabase:', url);
-    throw new Error('SUPABASE_URL inválida. Debe ser una URL HTTPS válida.');
-  }
-
-  // log de diagnóstico no sensible
-  console.info('[Supabase] host:', new URL(url).host, 'keyLen:', key.length);
-
-  window.sb = window.sb || supabase.createClient(url, key);
-})();
-const sb = window.sb;
+const sb = supabase.createClient(
+  'https://nzzzeycpfdtvzphbupbf.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44'
+);
 
 // SPA helpers
 const sections = ['hub','goals','meals','progress'];
@@ -69,7 +52,7 @@ $('#navToMeals')?.addEventListener('click', () => show('meals'));
 $('#ctaGoMeals')?.addEventListener('click', () => show('meals'));
 $('#navToProgress')?.addEventListener('click', () => show('progress'));
 $('#ctaGoProgress')?.addEventListener('click', () => show('progress'));
-$('#btnLogout')?.addEventListener('click', async()=>{ await window.sb.auth.signOut(); location.href='/'; });
+$('#btnLogout')?.addEventListener('click', async()=>{ await sb.auth.signOut(); location.href='/'; });
 $('#btnSaveGoals')?.addEventListener('click', saveGoals);
 $('#btnAddMeal')?.addEventListener('click', addMeal);
 $('#mealsTbody')?.addEventListener('click',e=>{
@@ -93,8 +76,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(!email || !password){ setLive('msgLogin','Ingresa correo y contraseña.'); return; }
     const btn=$('btnDoLogin'); btn.disabled=true; setLive('msgLogin','Ingresando…');
     try{
-      const { data, error } = await window.sb.auth.signInWithPassword({ email, password });
-      if(error){ console.error('[Login]',error); setLive('msgLogin', error.message||'No pudimos iniciar sesión.'); btn.disabled=false; return; }
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if(error){ console.error('[Login]',error); setLive('msgLogin', error.message); btn.disabled=false; return; }
       setLive('msgLogin','Sesión iniciada. Redirigiendo…');
       location.href='/app.html';
     }catch(err){
@@ -108,7 +91,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(!email||!password){ setLive('msgSignup','Completa correo y contraseña.'); return; }
     const btn=$('btnDoSignup'); btn.disabled=true; setLive('msgSignup','Creando cuenta…');
     try{
-      const { data, error } = await window.sb.auth.signUp({ email, password });
+      const { data, error } = await sb.auth.signUp({ email, password });
       if(error){ console.error('[Signup]',error); setLive('msgSignup', error.message||'No pudimos crear tu cuenta.'); btn.disabled=false; return; }
       setLive('msgSignup','Cuenta creada. Revisa tu correo para confirmar.');
       btn.disabled=false;
@@ -120,14 +103,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const email=$('liEmail')?.value?.trim(); if(!email){ setLive('msgLogin','Ingresa tu correo.'); return; }
     const btn=$('btnForgot'); btn.disabled=true; setLive('msgLogin','Enviando enlace…');
     try{
-      const { error } = await window.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin+'/reset.html' });
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin+'/reset.html' });
       if(error){ console.error('[Reset]',error); setLive('msgLogin', error.message||'No se pudo enviar el enlace.'); btn.disabled=false; return; }
       setLive('msgLogin','Te enviamos un enlace para restablecer tu contraseña.');
       btn.disabled=false;
     }catch(err){ console.error('[Reset unexpected]',err); setLive('msgLogin','Error inesperado.'); btn.disabled=false; }
   });
 
-  window.sb.auth.getSession().then(({ data:{ session } })=>{
+  sb.auth.getSession().then(({ data:{ session } })=>{
     if(session && !$('#hub')) location.href='/app.html';
   });
 });
@@ -136,7 +119,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 document.addEventListener('DOMContentLoaded', async () => {
   if (!$('#hub')) return; // solo en app.html
   try{
-    const { data: { session } } = await window.sb.auth.getSession();
+    const { data: { session } } = await sb.auth.getSession();
     if(!session){
       window.location.replace('/');
       return;
