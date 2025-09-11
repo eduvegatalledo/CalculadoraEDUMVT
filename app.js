@@ -31,6 +31,7 @@ function closeModal(id){
 const todayStr = () => new Date().toISOString().slice(0,10);
 
 // Supabase
+codex/remove-__env-script-block
 (function initSupabaseClient(){
   const url = 'https://nzzzeycpfdtvzphbupbf.supabase.co';
   const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56enpleWNwZmR0dnpwaGJ1cGJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0NDA3MTIsImV4cCI6MjA3MzAxNjcxMn0.HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44';
@@ -52,6 +53,12 @@ const todayStr = () => new Date().toISOString().slice(0,10);
   window.sb = window.sb || supabase.createClient(url, key);
 })();
 const sb = window.sb;
+=======
+const sb = supabase.createClient(
+  'https://nzzzeycpfdtvzphbupbf.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44'
+);
+main
 
 // SPA helpers
 const sections = ['hub','goals','meals','progress'];
@@ -69,7 +76,7 @@ $('#navToMeals')?.addEventListener('click', () => show('meals'));
 $('#ctaGoMeals')?.addEventListener('click', () => show('meals'));
 $('#navToProgress')?.addEventListener('click', () => show('progress'));
 $('#ctaGoProgress')?.addEventListener('click', () => show('progress'));
-$('#btnLogout')?.addEventListener('click', async()=>{ await window.sb.auth.signOut(); location.href='/'; });
+$('#btnLogout')?.addEventListener('click', async()=>{ await sb.auth.signOut(); location.href='/'; });
 $('#btnSaveGoals')?.addEventListener('click', saveGoals);
 $('#btnAddMeal')?.addEventListener('click', addMeal);
 $('#mealsTbody')?.addEventListener('click',e=>{
@@ -93,8 +100,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(!email || !password){ setLive('msgLogin','Ingresa correo y contraseña.'); return; }
     const btn=$('btnDoLogin'); btn.disabled=true; setLive('msgLogin','Ingresando…');
     try{
-      const { data, error } = await window.sb.auth.signInWithPassword({ email, password });
-      if(error){ console.error('[Login]',error); setLive('msgLogin', error.message||'No pudimos iniciar sesión.'); btn.disabled=false; return; }
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if(error){ console.error('[Login]',error); setLive('msgLogin', error.message); btn.disabled=false; return; }
       setLive('msgLogin','Sesión iniciada. Redirigiendo…');
       location.href='/app.html';
     }catch(err){
@@ -108,7 +115,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(!email||!password){ setLive('msgSignup','Completa correo y contraseña.'); return; }
     const btn=$('btnDoSignup'); btn.disabled=true; setLive('msgSignup','Creando cuenta…');
     try{
-      const { data, error } = await window.sb.auth.signUp({ email, password });
+      const { data, error } = await sb.auth.signUp({ email, password });
       if(error){ console.error('[Signup]',error); setLive('msgSignup', error.message||'No pudimos crear tu cuenta.'); btn.disabled=false; return; }
       setLive('msgSignup','Cuenta creada. Revisa tu correo para confirmar.');
       btn.disabled=false;
@@ -120,14 +127,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const email=$('liEmail')?.value?.trim(); if(!email){ setLive('msgLogin','Ingresa tu correo.'); return; }
     const btn=$('btnForgot'); btn.disabled=true; setLive('msgLogin','Enviando enlace…');
     try{
-      const { error } = await window.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin+'/reset.html' });
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin+'/reset.html' });
       if(error){ console.error('[Reset]',error); setLive('msgLogin', error.message||'No se pudo enviar el enlace.'); btn.disabled=false; return; }
       setLive('msgLogin','Te enviamos un enlace para restablecer tu contraseña.');
       btn.disabled=false;
     }catch(err){ console.error('[Reset unexpected]',err); setLive('msgLogin','Error inesperado.'); btn.disabled=false; }
   });
 
-  window.sb.auth.getSession().then(({ data:{ session } })=>{
+  sb.auth.getSession().then(({ data:{ session } })=>{
     if(session && !$('#hub')) location.href='/app.html';
   });
 });
@@ -136,7 +143,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 document.addEventListener('DOMContentLoaded', async () => {
   if (!$('#hub')) return; // solo en app.html
   try{
-    const { data: { session } } = await window.sb.auth.getSession();
+    const { data: { session } } = await sb.auth.getSession();
     if(!session){
       window.location.replace('/');
       return;
