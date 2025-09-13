@@ -129,6 +129,11 @@
   </main>
 
   <script src="/env.js"></script>
+  <script type="module">
+    import { guard } from './auth/sessionGuard.js';
+    import './auth/onAuthChanged.js';
+    guard();
+  </script>
   <script type="module" src="/app.js"></script>
 </body>
 </html>
