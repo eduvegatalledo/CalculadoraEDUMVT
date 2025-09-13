@@ -1,6 +1,9 @@
 (function initSupabase(){
-  const URL = 'https://nzzzeycpfdtvzphbupbf.supabase.co';
-  const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56enpleWNwZmR0dnpwaGJ1cGJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0NDA3MTIsImV4cCI6MjA3MzAxNjcxMn0.HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44';
+  const URL = typeof process !== 'undefined' ? process.env.SUPABASE_URL : undefined;
+  const KEY = typeof process !== 'undefined' ? process.env.SUPABASE_ANON_KEY : undefined;
+  if (!URL || !KEY) {
+    throw new Error('[Supabase] SUPABASE_URL y SUPABASE_ANON_KEY son requeridas');
+  }
   if (window.sb) {
     console.info('[Supabase] using existing client');
     return;
