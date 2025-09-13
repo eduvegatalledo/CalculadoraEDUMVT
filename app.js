@@ -44,28 +44,36 @@ let mealPage=0;
 let authSub=null;
 
 // Eventos de navegación
-$('#navToHub')?.addEventListener('click', () => show('hub'));
-$('#navToGoals')?.addEventListener('click', () => show('goals'));
-$('#ctaGoGoals')?.addEventListener('click', () => show('goals'));
-$('#navToMeals')?.addEventListener('click', () => show('meals'));
-$('#ctaGoMeals')?.addEventListener('click', () => show('meals'));
-$('#navToProgress')?.addEventListener('click', () => show('progress'));
-$('#ctaGoProgress')?.addEventListener('click', () => show('progress'));
-$('#btnLogout')?.addEventListener('click', async()=>{ await supabase.auth.signOut(); });
-$('#btnSaveGoals')?.addEventListener('click', saveGoals);
-$('#btnAddMeal')?.addEventListener('click', addMeal);
-$('#mealsTbody')?.addEventListener('click',e=>{
+$('navToHub')?.addEventListener('click', () => show('hub'));
+$('navToGoals')?.addEventListener('click', () => show('goals'));
+$('ctaGoGoals')?.addEventListener('click', () => show('goals'));
+$('navToMeals')?.addEventListener('click', () => show('meals'));
+$('ctaGoMeals')?.addEventListener('click', () => show('meals'));
+$('navToProgress')?.addEventListener('click', () => show('progress'));
+$('ctaGoProgress')?.addEventListener('click', () => show('progress'));
+$('btnLogout')?.addEventListener('click', async()=>{ await supabase.auth.signOut(); });
+$('btnSaveGoals')?.addEventListener('click', saveGoals);
+$('btnAddMeal')?.addEventListener('click', addMeal);
+$('mealsTbody')?.addEventListener('click',e=>{
   const btn = e.target.closest('.btnDelMeal');
   if(btn) deleteMeal(btn.dataset.id);
 });
-$('#btnMoreMeals')?.addEventListener('click', ()=>{ mealPage++; loadMealsToday(false); });
+$('btnMoreMeals')?.addEventListener('click', ()=>{ mealPage++; loadMealsToday(false); });
 
 // Landing: manejo de modales y auth
 document.addEventListener('DOMContentLoaded', ()=>{
   console.info('[landing] binding modal listeners');
-  $('#btnOpenLogin')?.addEventListener('click', () => openModal('loginModal'));
-  $('#btnOpenSignup')?.addEventListener('click', () => openModal('signupModal'));
   document.addEventListener('click', e => {
+    const loginBtn = e.target.closest('#btnOpenLogin');
+    if (loginBtn) {
+      openModal('loginModal');
+      return;
+    }
+    const signupBtn = e.target.closest('#btnOpenSignup');
+    if (signupBtn) {
+      openModal('signupModal');
+      return;
+    }
     const closeEl = e.target.closest('[data-close-modal]');
     if (closeEl) closeModal(closeEl.dataset.closeModal);
   });
@@ -117,13 +125,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
 
   supabase.auth.getSession().then(({ data:{ session } })=>{
-    if(session && !$('#hub')) location.href='/app.html';
+    if(session && !$('hub')) location.href='/app.html';
   });
 });
 
 // Carga inicial y guard de auth para app
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!$('#hub')) return; // solo en app.html
+  if (!$('hub')) return; // solo en app.html
   try{
     const { data: { session } } = await supabase.auth.getSession();
     if(!session){
@@ -157,22 +165,22 @@ async function loadGoals(){
   const { data } = await supabase.from('goals').select('*').eq('user_id', user.id).maybeSingle();
   goals = data;
   if(data){
-    $('#metaKcal').value = data.kcal_target || '';
-    $('#metaProt').value = data.protein_g_target || '';
-    $('#metaCarb').value = data.carbs_g_target || '';
-    $('#metaFat').value = data.fat_g_target || '';
-    $('#statGoals').textContent = `${fmt.kcal(data.kcal_target)} / ${fmt.g(data.protein_g_target)}`;
+    $('metaKcal').value = data.kcal_target || '';
+    $('metaProt').value = data.protein_g_target || '';
+    $('metaCarb').value = data.carbs_g_target || '';
+    $('metaFat').value = data.fat_g_target || '';
+    $('statGoals').textContent = `${fmt.kcal(data.kcal_target)} / ${fmt.g(data.protein_g_target)}`;
   }else{
-    $('#statGoals').textContent = 'Sin metas';
+    $('statGoals').textContent = 'Sin metas';
   }
-  $('#statGoals').classList.remove('skeleton');
+  $('statGoals').classList.remove('skeleton');
 }
 
 async function saveGoals(){
-  const kcal = Number($('#metaKcal').value);
-  const prot = Number($('#metaProt').value);
-  const carb = Number($('#metaCarb').value);
-  const fat = Number($('#metaFat').value);
+  const kcal = Number($('metaKcal').value);
+  const prot = Number($('metaProt').value);
+  const carb = Number($('metaCarb').value);
+  const fat = Number($('metaFat').value);
   if([kcal,prot,carb,fat].some(v=>isNaN(v)||v<=0)){
     setLive('msgGoals','Ingresa valores válidos');
     return;
@@ -191,7 +199,7 @@ async function saveGoals(){
 }
 
 async function loadMealsToday(reset=true){
-  const body = $('#mealsTbody');
+  const body = $('mealsTbody');
   if(reset){ body.innerHTML=''; mealPage=0; }
   const { data, error, count } = await supabase.from('meals')
     .select('id,food_name,kcal,protein_g,carbs_g,fat_g',{ count:'exact' })
@@ -252,16 +260,16 @@ async function loadMealsToday(reset=true){
       body.appendChild(tr);
     });
   }
-  if((mealPage+1)*10 < (count||0)) $('#btnMoreMeals').classList.remove('hide'); else $('#btnMoreMeals').classList.add('hide');
+  if((mealPage+1)*10 < (count||0)) $('btnMoreMeals').classList.remove('hide'); else $('btnMoreMeals').classList.add('hide');
 
   const { data:totals } = await supabase.from('v_daily_totals').select('*').eq('user_id', user.id).eq('day', todayStr()).maybeSingle();
   renderTodaySummary(totals);
-  $('#statMeals').textContent = `${count||0} regs / ${fmt.kcal(totals?.kcal)}`;
-  $('#statMeals').classList.remove('skeleton');
+  $('statMeals').textContent = `${count||0} regs / ${fmt.kcal(totals?.kcal)}`;
+  $('statMeals').classList.remove('skeleton');
 }
 
 function renderTodaySummary(totals){
-  const summary = $('#todaySummary');
+  const summary = $('todaySummary');
   summary.innerHTML='';
   const t = totals || {};
   const g = goals || {};
@@ -282,15 +290,15 @@ function renderTodaySummary(totals){
 }
 
 async function addMeal(){
-  const name=$('#mealName').value.trim();
+  const name=$('mealName').value.trim();
   const tmp=document.createElement('div');
   tmp.innerHTML=name;
   if(tmp.textContent !== name){ setLive('msgMeals','Nombre inválido'); return; }
-  const qty=Number($('#mealQty').value);
-  const prot=Number($('#mealProt').value);
-  const carb=Number($('#mealCarb').value);
-  const fat=Number($('#mealFat').value);
-  const kcalInput=Number($('#mealKcal').value);
+  const qty=Number($('mealQty').value);
+  const prot=Number($('mealProt').value);
+  const carb=Number($('mealCarb').value);
+  const fat=Number($('mealFat').value);
+  const kcalInput=Number($('mealKcal').value);
   if(!name || qty<=0){ setLive('msgMeals','Datos inválidos'); return; }
   const kcal = kcalInput>0 ? kcalInput : prot*4 + carb*4 + fat*9;
     const { error } = await supabase.from('meals').insert({
@@ -306,7 +314,7 @@ async function addMeal(){
   setLive('msgMeals', error?('Error: '+error.message):'Agregado');
   if(!error){
     ['mealName','mealQty','mealProt','mealCarb','mealFat','mealKcal'].forEach(id=>{$(id).value='';});
-    $('#mealQty').value='100';
+    $('mealQty').value='100';
     await loadMealsToday();
     await loadCompliance7d();
   }
@@ -330,16 +338,16 @@ async function loadCompliance7d(){
     data.forEach(d=>{ points.push({day:d.day,pct:(d.kcal/gkcal*100)}); });
   }
   const avg = points.length ? points.reduce((a,b)=>a+b.pct,0)/points.length : 0;
-  $('#kpiCompliance').textContent = fmt.pct(avg);
-  $('#statProgress').textContent = points.length ? fmt.pct(avg) : 'Sin datos';
+  $('kpiCompliance').textContent = fmt.pct(avg);
+  $('statProgress').textContent = points.length ? fmt.pct(avg) : 'Sin datos';
   renderChart(points);
-  $('#kpiCompliance').classList.remove('skeleton');
-  $('#statProgress').classList.remove('skeleton');
+  $('kpiCompliance').classList.remove('skeleton');
+  $('statProgress').classList.remove('skeleton');
   setLive('msgProgress', points.length ? '' : 'Registra tus comidas para ver tu progreso.');
 }
 
 function renderChart(points){
-  const area = $('#chartArea');
+  const area = $('chartArea');
   area.innerHTML='';
   if(!points.length) return;
   points.forEach(p=>{
