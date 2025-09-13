@@ -17,6 +17,7 @@ function setLive(id, msg){
   }
 }
 function openModal(id){
+  console.info('[openModal]', id);
   const m = $(id);
   if(m){
     m.classList.remove('hide');
@@ -24,6 +25,7 @@ function openModal(id){
   }
 }
 function closeModal(id){
+  console.info('[closeModal]', id);
   const m = $(id);
   if(m){
     m.classList.add('hide');
@@ -58,6 +60,23 @@ $('#mealsTbody')?.addEventListener('click',e=>{
 });
 $('#btnMoreMeals')?.addEventListener('click', ()=>{ mealPage++; loadMealsToday(false); });
 
+// Delegación de eventos para modales en landing
+document.addEventListener('click', e => {
+  const t = e.target;
+  if (t.closest('#btnOpenLogin')) {
+    openModal('loginModal');
+    return;
+  }
+  if (t.closest('#btnOpenSignup')) {
+    openModal('signupModal');
+    return;
+  }
+  const closeEl = t.closest('[data-close-modal]');
+  if (closeEl) {
+    closeModal(closeEl.dataset.closeModal);
+  }
+});
+
 // Landing: manejo de modales y auth
 document.addEventListener('DOMContentLoaded', ()=>{
   const msg = sessionStorage.getItem('landingMsg');
@@ -65,11 +84,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     setLive('accessMsg', msg);
     sessionStorage.removeItem('landingMsg');
   }
-  $('btnOpenLogin')?.addEventListener('click', () => openModal('loginModal'));
-  $('btnOpenSignup')?.addEventListener('click', () => openModal('signupModal'));
-  $('btnCloseLogin')?.addEventListener('click', () => closeModal('loginModal'));
-  $('btnCloseSignup')?.addEventListener('click', () => closeModal('signupModal'));
-
   $('btnDoLogin')?.addEventListener('click', onDoLogin);
   async function onDoLogin(e){
     e.preventDefault();
