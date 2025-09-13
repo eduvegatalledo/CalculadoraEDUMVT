@@ -1,3 +1,4 @@
+codex/create-and-configure-environment-variables
 (function initSupabase(){
   const URL = typeof process !== 'undefined' ? process.env.SUPABASE_URL : undefined;
   const KEY = typeof process !== 'undefined' ? process.env.SUPABASE_ANON_KEY : undefined;
@@ -19,3 +20,13 @@
     console.error('[Supabase] init error', err);
   }
 })();
+=======
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
+
+export default supabase;
+main
