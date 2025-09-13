@@ -177,13 +177,57 @@ async function loadMealsToday(reset=true){
     .eq('user_id', user.id).eq('eaten_at', todayStr())
     .order('id',{ascending:false})
     .range(mealPage*10, mealPage*10+9);
-  if(error){ body.innerHTML=`<tr><td colspan="6" class="muted">Error</td></tr>`; return; }
+  if(error){
+    const tr=document.createElement('tr');
+    const td=document.createElement('td');
+    td.colSpan=6;
+    td.className='muted';
+    td.textContent='Error';
+    tr.appendChild(td);
+    body.appendChild(tr);
+    return;
+  }
   if(reset && (!data || data.length===0)){
-    body.innerHTML=`<tr><td colspan="6" class="muted">Aún no hay comidas</td></tr>`;
+    const tr=document.createElement('tr');
+    const td=document.createElement('td');
+    td.colSpan=6;
+    td.className='muted';
+    td.textContent='Aún no hay comidas';
+    tr.appendChild(td);
+    body.appendChild(tr);
   }else{
     data.forEach(m=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${m.food_name}</td><td>${Math.round(m.kcal)}</td><td>${Math.round(m.protein_g)}</td><td>${Math.round(m.carbs_g)}</td><td>${Math.round(m.fat_g)}</td><td><button type="button" class="chip btnDelMeal" data-id="${m.id}">✕</button></td>`;
+
+      const tdName=document.createElement('td');
+      tdName.textContent=m.food_name;
+      tr.appendChild(tdName);
+
+      const tdKcal=document.createElement('td');
+      tdKcal.textContent=Math.round(m.kcal);
+      tr.appendChild(tdKcal);
+
+      const tdProt=document.createElement('td');
+      tdProt.textContent=Math.round(m.protein_g);
+      tr.appendChild(tdProt);
+
+      const tdCarb=document.createElement('td');
+      tdCarb.textContent=Math.round(m.carbs_g);
+      tr.appendChild(tdCarb);
+
+      const tdFat=document.createElement('td');
+      tdFat.textContent=Math.round(m.fat_g);
+      tr.appendChild(tdFat);
+
+      const tdBtn=document.createElement('td');
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='chip btnDelMeal';
+      btn.dataset.id=m.id;
+      btn.textContent='✕';
+      tdBtn.appendChild(btn);
+      tr.appendChild(tdBtn);
+
       body.appendChild(tr);
     });
   }
@@ -218,6 +262,9 @@ function renderTodaySummary(totals){
 
 async function addMeal(){
   const name=$('#mealName').value.trim();
+  const tmp=document.createElement('div');
+  tmp.innerHTML=name;
+  if(tmp.textContent !== name){ setLive('msgMeals','Nombre inválido'); return; }
   const qty=Number($('#mealQty').value);
   const prot=Number($('#mealProt').value);
   const carb=Number($('#mealCarb').value);
