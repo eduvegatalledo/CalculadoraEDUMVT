@@ -34,7 +34,7 @@
 
   <!-- Login Modal -->
   <div id="loginModal" class="modal hide" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-    <div class="modal-backdrop"></div>
+    <div class="modal-backdrop" data-close-modal="loginModal"></div>
     <div class="modal-card card">
       <h2 id="loginTitle">Iniciar sesión</h2>
       <div class="stack-12">
@@ -51,7 +51,7 @@
       <div class="row space-between">
         <button id="btnForgot" class="btn btn-soft" type="button">Olvidé mi contraseña</button>
         <div class="row">
-          <button id="btnCloseLogin" class="btn" type="button">Cancelar</button>
+        <button id="btnCloseLogin" class="btn" type="button" data-close-modal="loginModal">Cancelar</button>
           <button id="btnDoLogin" class="btn btn-primary" type="button">Entrar</button>
         </div>
       </div>
@@ -60,7 +60,7 @@
 
   <!-- Signup Modal -->
   <div id="signupModal" class="modal hide" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
-    <div class="modal-backdrop"></div>
+    <div class="modal-backdrop" data-close-modal="signupModal"></div>
     <div class="modal-card card">
       <h2 id="signupTitle">Crear cuenta</h2>
       <div class="stack-12">
@@ -75,7 +75,7 @@
       </div>
       <p id="msgSignup" class="muted" role="status" aria-live="polite"></p>
       <div class="row end">
-        <button id="btnCloseSignup" class="btn" type="button">Cancelar</button>
+        <button id="btnCloseSignup" class="btn" type="button" data-close-modal="signupModal">Cancelar</button>
         <button id="btnDoSignup" class="btn btn-primary" type="button">Crear cuenta</button>
       </div>
     </div>
