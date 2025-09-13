@@ -2,4 +2,4 @@
 
 ## Configuración
 
-Copia `.env.example` a `.env` y rellena `SUPABASE_URL` y `SUPABASE_ANON_KEY` con los valores de tu proyecto de Supabase.
+La aplicación obtiene la configuración de Supabase en tiempo de ejecución desde [`env.js`](./env.js). Si deseas usar tus propias credenciales, edita ese archivo con la URL y anon key de tu proyecto de Supabase.
