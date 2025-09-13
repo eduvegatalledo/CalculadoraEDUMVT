@@ -65,8 +65,19 @@ document.addEventListener('DOMContentLoaded', ()=>{
     setLive('accessMsg', msg);
     sessionStorage.removeItem('landingMsg');
   }
-  $('btnOpenLogin')?.addEventListener('click', ()=>openModal?.('loginModal'));
-  $('btnOpenSignup')?.addEventListener('click',()=>openModal?.('signupModal'));
+  const btnOpenLogin = $('btnOpenLogin');
+  if(btnOpenLogin){
+    btnOpenLogin.addEventListener('click', () => openModal('loginModal'));
+  }else{
+    console.warn('btnOpenLogin not found');
+  }
+
+  const btnOpenSignup = $('btnOpenSignup');
+  if(btnOpenSignup){
+    btnOpenSignup.addEventListener('click', () => openModal('signupModal'));
+  }else{
+    console.warn('btnOpenSignup not found');
+  }
   $('btnCloseLogin')?.addEventListener('click', ()=>closeModal('loginModal'));
   $('btnCloseSignup')?.addEventListener('click', ()=>closeModal('signupModal'));
 
