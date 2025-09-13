@@ -39,6 +39,7 @@ function show(id){ sections.forEach(s => $(s).classList.toggle('hide', s!==id));
 let user=null;
 let goals=null;
 let mealPage=0;
+let authSub=null;
 
 // Eventos de navegación
 $('#navToHub')?.addEventListener('click', () => show('hub'));
@@ -48,7 +49,7 @@ $('#navToMeals')?.addEventListener('click', () => show('meals'));
 $('#ctaGoMeals')?.addEventListener('click', () => show('meals'));
 $('#navToProgress')?.addEventListener('click', () => show('progress'));
 $('#ctaGoProgress')?.addEventListener('click', () => show('progress'));
-$('#btnLogout')?.addEventListener('click', async()=>{ await window.sb.auth.signOut(); location.href='/'; });
+$('#btnLogout')?.addEventListener('click', async()=>{ await window.sb.auth.signOut(); });
 $('#btnSaveGoals')?.addEventListener('click', saveGoals);
 $('#btnAddMeal')?.addEventListener('click', addMeal);
 $('#mealsTbody')?.addEventListener('click',e=>{
@@ -59,6 +60,11 @@ $('#btnMoreMeals')?.addEventListener('click', ()=>{ mealPage++; loadMealsToday(f
 
 // Landing: manejo de modales y auth
 document.addEventListener('DOMContentLoaded', ()=>{
+  const msg = sessionStorage.getItem('landingMsg');
+  if(msg){
+    setLive('accessMsg', msg);
+    sessionStorage.removeItem('landingMsg');
+  }
   $('btnOpenLogin')?.addEventListener('click', ()=>openModal?.('loginModal'));
   $('btnOpenSignup')?.addEventListener('click',()=>openModal?.('signupModal'));
   $('btnCloseLogin')?.addEventListener('click', ()=>closeModal('loginModal'));
@@ -114,22 +120,33 @@ document.addEventListener('DOMContentLoaded', ()=>{
 // Carga inicial y guard de auth para app
 document.addEventListener('DOMContentLoaded', async () => {
   if (!$('#hub')) return; // solo en app.html
-    try{
-      const { data: { session } } = await window.sb.auth.getSession();
-      if(!session){
-        window.location.replace('/');
-        return;
-      }
-      user = session.user;
-      await loadGoals();
-      await loadMealsToday();
-      await loadCompliance7d();
-      show('hub');
-    }catch(err){
-      console.error('[Guard]', err);
+  try{
+    const { data: { session } } = await window.sb.auth.getSession();
+    if(!session){
       window.location.replace('/');
+      return;
     }
-  });
+    user = session.user;
+    await loadGoals();
+    await loadMealsToday();
+    await loadCompliance7d();
+    show('hub');
+    const { data:{ subscription } } = window.sb.auth.onAuthStateChange((_event, session)=>{
+      if(!session){
+        sessionStorage.setItem('landingMsg','Tu sesión ha finalizado.');
+        window.location.replace('/');
+      }
+    });
+    authSub = subscription;
+  }catch(err){
+    console.error('[Guard]', err);
+    window.location.replace('/');
+  }
+});
+
+window.addEventListener('beforeunload',()=>{
+  authSub?.unsubscribe();
+});
 
 // Funciones de datos
 async function loadGoals(){
