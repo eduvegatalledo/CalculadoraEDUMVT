@@ -1,3 +1,4 @@
+ codex/add-minimalist-dashboard-with-three-cards
 import { sb as supabase } from '../supabase-client.js';
 
 async function ensureSession() {
@@ -14,3 +15,13 @@ async function ensureSession() {
 }
 
 ensureSession();
+=======
+import { sb } from './authClient.js';
+
+export async function guard() {
+  const { data } = await sb.auth.getSession();
+  if (!data?.session) {
+    window.location = '/index.html';
+  }
+}
+ main

@@ -34,6 +34,14 @@
     </section>
   </main>
   <script src="/env.js"></script>
+ codex/add-minimalist-dashboard-with-three-cards
   <script type="module" src="/auth/sessionGuard.js"></script>
+  <script type="module">
+    import { guard } from './auth/sessionGuard.js';
+    import './auth/onAuthChanged.js';
+    guard();
+  </script>
+  <script type="module" src="/app.js"></script>
+ main
 </body>
 </html>
