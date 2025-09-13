@@ -30,35 +30,7 @@ function closeModal(id){
 }
 const todayStr = () => new Date().toISOString().slice(0,10);
 
-// Supabase
-codex/remove-__env-script-block
-(function initSupabaseClient(){
-  const url = 'https://nzzzeycpfdtvzphbupbf.supabase.co';
-  const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56enpleWNwZmR0dnpwaGJ1cGJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0NDA3MTIsImV4cCI6MjA3MzAxNjcxMn0.HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44';
-
-  function isValidUrl(u){ try{ const x=new URL(u); return x.protocol==='https:'; }catch{ return false; } }
-
-  if(!url || !key){
-    console.error('[ENV] Faltan credenciales de Supabase.', { hasUrl: !!url, hasKey: !!key });
-    throw new Error('Configuración inválida: faltan credenciales públicas de Supabase.');
-  }
-  if(!isValidUrl(url)){
-    console.error('[ENV] URL inválida para Supabase:', url);
-    throw new Error('URL de Supabase inválida. Debe ser una URL HTTPS válida.');
-  }
-
-  // log de diagnóstico no sensible
-  console.info('[Supabase] host:', new URL(url).host, 'keyLen:', key.length);
-
-  window.sb = window.sb || supabase.createClient(url, key);
-})();
-const sb = window.sb;
-=======
-const sb = supabase.createClient(
-  'https://nzzzeycpfdtvzphbupbf.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...HoAjTwnWdtjueVALlX4-du7uF919QEMj8SS2CHP0N44'
-);
-main
+// Supabase client se inicializa en supabase-client.js
 
 // SPA helpers
 const sections = ['hub','goals','meals','progress'];
@@ -76,7 +48,7 @@ $('#navToMeals')?.addEventListener('click', () => show('meals'));
 $('#ctaGoMeals')?.addEventListener('click', () => show('meals'));
 $('#navToProgress')?.addEventListener('click', () => show('progress'));
 $('#ctaGoProgress')?.addEventListener('click', () => show('progress'));
-$('#btnLogout')?.addEventListener('click', async()=>{ await sb.auth.signOut(); location.href='/'; });
+$('#btnLogout')?.addEventListener('click', async()=>{ await window.sb.auth.signOut(); location.href='/'; });
 $('#btnSaveGoals')?.addEventListener('click', saveGoals);
 $('#btnAddMeal')?.addEventListener('click', addMeal);
 $('#mealsTbody')?.addEventListener('click',e=>{
@@ -100,7 +72,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(!email || !password){ setLive('msgLogin','Ingresa correo y contraseña.'); return; }
     const btn=$('btnDoLogin'); btn.disabled=true; setLive('msgLogin','Ingresando…');
     try{
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      const { data, error } = await window.sb.auth.signInWithPassword({ email, password });
       if(error){ console.error('[Login]',error); setLive('msgLogin', error.message); btn.disabled=false; return; }
       setLive('msgLogin','Sesión iniciada. Redirigiendo…');
       location.href='/app.html';
@@ -115,7 +87,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(!email||!password){ setLive('msgSignup','Completa correo y contraseña.'); return; }
     const btn=$('btnDoSignup'); btn.disabled=true; setLive('msgSignup','Creando cuenta…');
     try{
-      const { data, error } = await sb.auth.signUp({ email, password });
+      const { data, error } = await window.sb.auth.signUp({ email, password });
       if(error){ console.error('[Signup]',error); setLive('msgSignup', error.message||'No pudimos crear tu cuenta.'); btn.disabled=false; return; }
       setLive('msgSignup','Cuenta creada. Revisa tu correo para confirmar.');
       btn.disabled=false;
@@ -127,14 +99,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const email=$('liEmail')?.value?.trim(); if(!email){ setLive('msgLogin','Ingresa tu correo.'); return; }
     const btn=$('btnForgot'); btn.disabled=true; setLive('msgLogin','Enviando enlace…');
     try{
-      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin+'/reset.html' });
+      const { error } = await window.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin+'/reset.html' });
       if(error){ console.error('[Reset]',error); setLive('msgLogin', error.message||'No se pudo enviar el enlace.'); btn.disabled=false; return; }
       setLive('msgLogin','Te enviamos un enlace para restablecer tu contraseña.');
       btn.disabled=false;
     }catch(err){ console.error('[Reset unexpected]',err); setLive('msgLogin','Error inesperado.'); btn.disabled=false; }
   });
 
-  sb.auth.getSession().then(({ data:{ session } })=>{
+  window.sb.auth.getSession().then(({ data:{ session } })=>{
     if(session && !$('#hub')) location.href='/app.html';
   });
 });
@@ -142,26 +114,26 @@ document.addEventListener('DOMContentLoaded', ()=>{
 // Carga inicial y guard de auth para app
 document.addEventListener('DOMContentLoaded', async () => {
   if (!$('#hub')) return; // solo en app.html
-  try{
-    const { data: { session } } = await sb.auth.getSession();
-    if(!session){
+    try{
+      const { data: { session } } = await window.sb.auth.getSession();
+      if(!session){
+        window.location.replace('/');
+        return;
+      }
+      user = session.user;
+      await loadGoals();
+      await loadMealsToday();
+      await loadCompliance7d();
+      show('hub');
+    }catch(err){
+      console.error('[Guard]', err);
       window.location.replace('/');
-      return;
     }
-    user = session.user;
-    await loadGoals();
-    await loadMealsToday();
-    await loadCompliance7d();
-    show('hub');
-  }catch(err){
-    console.error('[Guard]', err);
-    window.location.replace('/');
-  }
-});
+  });
 
 // Funciones de datos
 async function loadGoals(){
-  const { data } = await sb.from('goals').select('*').eq('user_id', user.id).maybeSingle();
+  const { data } = await window.sb.from('goals').select('*').eq('user_id', user.id).maybeSingle();
   goals = data;
   if(data){
     $('#metaKcal').value = data.kcal_target || '';
@@ -184,7 +156,7 @@ async function saveGoals(){
     setLive('msgGoals','Ingresa valores válidos');
     return;
   }
-  const { error } = await sb.from('goals').upsert({
+    const { error } = await window.sb.from('goals').upsert({
     user_id:user.id,
     kcal_target:kcal,
     protein_g_target:prot,
@@ -200,7 +172,7 @@ async function saveGoals(){
 async function loadMealsToday(reset=true){
   const body = $('#mealsTbody');
   if(reset){ body.innerHTML=''; mealPage=0; }
-  const { data, error, count } = await sb.from('meals')
+  const { data, error, count } = await window.sb.from('meals')
     .select('id,food_name,kcal,protein_g,carbs_g,fat_g',{ count:'exact' })
     .eq('user_id', user.id).eq('eaten_at', todayStr())
     .order('id',{ascending:false})
@@ -217,7 +189,7 @@ async function loadMealsToday(reset=true){
   }
   if((mealPage+1)*10 < (count||0)) $('#btnMoreMeals').classList.remove('hide'); else $('#btnMoreMeals').classList.add('hide');
 
-  const { data:totals } = await sb.from('v_daily_totals').select('*').eq('user_id', user.id).eq('day', todayStr()).maybeSingle();
+  const { data:totals } = await window.sb.from('v_daily_totals').select('*').eq('user_id', user.id).eq('day', todayStr()).maybeSingle();
   renderTodaySummary(totals);
   $('#statMeals').textContent = `${count||0} regs / ${fmt.kcal(totals?.kcal)}`;
   $('#statMeals').classList.remove('skeleton');
@@ -253,7 +225,7 @@ async function addMeal(){
   const kcalInput=Number($('#mealKcal').value);
   if(!name || qty<=0){ setLive('msgMeals','Datos inválidos'); return; }
   const kcal = kcalInput>0 ? kcalInput : prot*4 + carb*4 + fat*9;
-  const { error } = await sb.from('meals').insert({
+    const { error } = await window.sb.from('meals').insert({
     user_id:user.id,
     eaten_at:todayStr(),
     food_name:name,
@@ -274,7 +246,7 @@ async function addMeal(){
 
 async function deleteMeal(id){
   if(!confirm('¿Eliminar comida?')) return;
-  await sb.from('meals').delete().eq('id', id);
+    await window.sb.from('meals').delete().eq('id', id);
   await loadMealsToday();
   await loadCompliance7d();
 }
@@ -283,7 +255,7 @@ async function loadCompliance7d(){
   const fromDate = new Date();
   fromDate.setDate(fromDate.getDate()-6);
   const start = fromDate.toISOString().slice(0,10);
-  const { data } = await sb.from('v_daily_totals').select('day,kcal').eq('user_id', user.id).gte('day', start).lte('day', todayStr()).order('day');
+  const { data } = await window.sb.from('v_daily_totals').select('day,kcal').eq('user_id', user.id).gte('day', start).lte('day', todayStr()).order('day');
   const gkcal = goals?.kcal_target;
   const points=[];
   if(gkcal && data){
