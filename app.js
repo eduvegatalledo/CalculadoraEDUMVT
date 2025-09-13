@@ -1,4 +1,4 @@
-import supabase from './supabase-client.js';
+import { supabase } from './supabase-client.js';
 
 // Utilidades y helpers
 const $ = id => document.getElementById(id);
@@ -17,6 +17,7 @@ function setLive(id, msg){
   }
 }
 function openModal(id){
+  console.info('[openModal]', id);
   const m = $(id);
   if(m){
     m.classList.remove('hide');
@@ -24,6 +25,7 @@ function openModal(id){
   }
 }
 function closeModal(id){
+  console.info('[closeModal]', id);
   const m = $(id);
   if(m){
     m.classList.add('hide');
@@ -60,16 +62,18 @@ $('#btnMoreMeals')?.addEventListener('click', ()=>{ mealPage++; loadMealsToday(f
 
 // Landing: manejo de modales y auth
 document.addEventListener('DOMContentLoaded', ()=>{
+  console.info('[landing] binding modal listeners');
+  $('#btnOpenLogin')?.addEventListener('click', () => openModal('loginModal'));
+  $('#btnOpenSignup')?.addEventListener('click', () => openModal('signupModal'));
+  document.addEventListener('click', e => {
+    const closeEl = e.target.closest('[data-close-modal]');
+    if (closeEl) closeModal(closeEl.dataset.closeModal);
+  });
   const msg = sessionStorage.getItem('landingMsg');
   if(msg){
     setLive('accessMsg', msg);
     sessionStorage.removeItem('landingMsg');
   }
-  $('btnOpenLogin')?.addEventListener('click', ()=>openModal?.('loginModal'));
-  $('btnOpenSignup')?.addEventListener('click',()=>openModal?.('signupModal'));
-  $('btnCloseLogin')?.addEventListener('click', ()=>closeModal('loginModal'));
-  $('btnCloseSignup')?.addEventListener('click', ()=>closeModal('signupModal'));
-
   $('btnDoLogin')?.addEventListener('click', onDoLogin);
   async function onDoLogin(e){
     e.preventDefault();
