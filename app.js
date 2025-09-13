@@ -60,25 +60,15 @@ $('#mealsTbody')?.addEventListener('click',e=>{
 });
 $('#btnMoreMeals')?.addEventListener('click', ()=>{ mealPage++; loadMealsToday(false); });
 
-// Delegación de eventos para modales en landing
-document.addEventListener('click', e => {
-  const t = e.target;
-  if (t.closest('#btnOpenLogin')) {
-    openModal('loginModal');
-    return;
-  }
-  if (t.closest('#btnOpenSignup')) {
-    openModal('signupModal');
-    return;
-  }
-  const closeEl = t.closest('[data-close-modal]');
-  if (closeEl) {
-    closeModal(closeEl.dataset.closeModal);
-  }
-});
-
 // Landing: manejo de modales y auth
 document.addEventListener('DOMContentLoaded', ()=>{
+  console.info('[landing] binding modal listeners');
+  $('#btnOpenLogin')?.addEventListener('click', () => openModal('loginModal'));
+  $('#btnOpenSignup')?.addEventListener('click', () => openModal('signupModal'));
+  document.addEventListener('click', e => {
+    const closeEl = e.target.closest('[data-close-modal]');
+    if (closeEl) closeModal(closeEl.dataset.closeModal);
+  });
   const msg = sessionStorage.getItem('landingMsg');
   if(msg){
     setLive('accessMsg', msg);
