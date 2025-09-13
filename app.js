@@ -162,7 +162,14 @@ window.addEventListener('beforeunload',()=>{
 
 // Funciones de datos
 async function loadGoals(){
-  const { data } = await supabase.from('goals').select('*').eq('user_id', user.id).maybeSingle();
+  const { data, error } = await supabase.from('goals').select('*').eq('user_id', user.id).maybeSingle();
+  if(error){
+    console.error('[loadGoals]', error);
+    setLive('msgGoals','Error de base de datos. ¿Aplicaste /db/schema.sql?');
+    $('statGoals').textContent = 'Sin metas';
+    $('statGoals').classList.remove('skeleton');
+    return;
+  }
   goals = data;
   if(data){
     $('metaKcal').value = data.kcal_target || '';
@@ -207,6 +214,8 @@ async function loadMealsToday(reset=true){
     .order('id',{ascending:false})
     .range(mealPage*10, mealPage*10+9);
   if(error){
+    console.error('[loadMealsToday]', error);
+    setLive('msgMeals','Error de base de datos. ¿Aplicaste /db/schema.sql?');
     const tr=document.createElement('tr');
     const td=document.createElement('td');
     td.colSpan=6;
@@ -262,8 +271,12 @@ async function loadMealsToday(reset=true){
   }
   if((mealPage+1)*10 < (count||0)) $('btnMoreMeals').classList.remove('hide'); else $('btnMoreMeals').classList.add('hide');
 
-  const { data:totals } = await supabase.from('v_daily_totals').select('*').eq('user_id', user.id).eq('day', todayStr()).maybeSingle();
-  renderTodaySummary(totals);
+  const { data:totals, error:totalsError } = await supabase.from('v_daily_totals').select('*').eq('user_id', user.id).eq('day', todayStr()).maybeSingle();
+  if(totalsError){
+    console.error('[loadMealsToday totals]', totalsError);
+    setLive('msgMeals','Error de base de datos. ¿Aplicaste /db/schema.sql?');
+  }
+  renderTodaySummary(totalsError?null:totals);
   $('statMeals').textContent = `${count||0} regs / ${fmt.kcal(totals?.kcal)}`;
   $('statMeals').classList.remove('skeleton');
 }
@@ -331,7 +344,14 @@ async function loadCompliance7d(){
   const fromDate = new Date();
   fromDate.setDate(fromDate.getDate()-6);
   const start = fromDate.toISOString().slice(0,10);
-  const { data } = await supabase.from('v_daily_totals').select('day,kcal').eq('user_id', user.id).gte('day', start).lte('day', todayStr()).order('day');
+  const { data, error } = await supabase.from('v_daily_totals').select('day,kcal').eq('user_id', user.id).gte('day', start).lte('day', todayStr()).order('day');
+  if(error){
+    console.error('[loadCompliance7d]', error);
+    setLive('msgProgress','Error de base de datos. ¿Aplicaste /db/schema.sql?');
+    $('kpiCompliance').classList.remove('skeleton');
+    $('statProgress').classList.remove('skeleton');
+    return;
+  }
   const gkcal = goals?.kcal_target;
   const points=[];
   if(gkcal && data){
