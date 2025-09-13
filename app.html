@@ -6,129 +6,34 @@
   <title>Prouti — Tu panel</title>
   <meta name="theme-color" content="#10b981" />
   <link rel="stylesheet" href="/styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Rubik+Rounded:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Rubik+Rounded:wght@400;500&display=swap" rel="stylesheet" />
 </head>
 <body>
   <header class="topbar" role="banner">
-    <a id="navToHub" class="brand" href="#hub">Prouti</a>
-    <nav class="menu" aria-label="Navegación principal">
-      <button id="navToGoals" class="chip" type="button">Metas</button>
-      <button id="navToMeals" class="chip" type="button">Comidas</button>
-      <button id="navToProgress" class="chip" type="button">Progreso</button>
-    </nav>
+    <a class="brand" href="/">Prouti</a>
     <div class="user-menu">
       <button id="btnLogout" class="chip" type="button">Cerrar sesión</button>
     </div>
   </header>
-
   <main>
-    <section id="hub" class="section">
+    <section class="section">
       <div class="hub-grid">
         <article class="hub-card card">
           <h2>Calcula tus macros</h2>
-          <p id="statGoals" class="quick-stat skeleton">…</p>
-          <button id="ctaGoGoals" class="btn btn-primary" type="button">Ir a metas</button>
+          <a href="/calc.html" class="btn btn-primary">Ir</a>
         </article>
         <article class="hub-card card">
           <h2>Registra tus comidas</h2>
-          <p id="statMeals" class="quick-stat skeleton">…</p>
-          <button id="ctaGoMeals" class="btn btn-primary" type="button">Ir a comidas</button>
+          <a href="/log.html" class="btn btn-primary">Ir</a>
         </article>
         <article class="hub-card card">
           <h2>Mide tu avance</h2>
-          <p id="statProgress" class="quick-stat skeleton">…</p>
-          <button id="ctaGoProgress" class="btn btn-primary" type="button">Ver progreso</button>
+          <a href="/progress.html" class="btn btn-primary">Ir</a>
         </article>
       </div>
     </section>
-
-    <section id="goals" class="section hide" aria-labelledby="hGoals">
-      <h2 id="hGoals">Metas</h2>
-      <div class="card">
-        <form class="grid" autocomplete="off">
-          <div>
-            <label for="metaKcal">Calorías (kcal)</label>
-            <input id="metaKcal" type="number" inputmode="numeric" min="0" />
-          </div>
-          <div>
-            <label for="metaProt">Proteína (g)</label>
-            <input id="metaProt" type="number" inputmode="numeric" min="0" />
-          </div>
-          <div>
-            <label for="metaCarb">Carbos (g)</label>
-            <input id="metaCarb" type="number" inputmode="numeric" min="0" />
-          </div>
-          <div>
-            <label for="metaFat">Grasas (g)</label>
-            <input id="metaFat" type="number" inputmode="numeric" min="0" />
-          </div>
-          <div class="actions">
-            <button id="btnSaveGoals" class="btn btn-primary" type="button">Guardar metas</button>
-          </div>
-        </form>
-        <p id="msgGoals" class="muted" aria-live="polite"></p>
-      </div>
-    </section>
-
-    <section id="meals" class="section hide" aria-labelledby="hMeals">
-      <h2 id="hMeals">Comidas</h2>
-      <div id="todaySummary" class="card">
-        <div class="progress-row skeleton"><span>Calorías</span><div class="bar"><div class="fill" style="width:0%"></div></div><span>0/0</span></div>
-      </div>
-      <div class="card">
-        <form class="grid meal-grid" autocomplete="off">
-          <div class="wide">
-            <label for="mealName">Nombre</label>
-            <input id="mealName" type="text" autocomplete="off" />
-          </div>
-          <div>
-            <label for="mealQty">Cantidad (g)</label>
-            <input id="mealQty" type="number" step="1" min="0" value="100" />
-          </div>
-          <div>
-            <label for="mealKcal">Calorías</label>
-            <input id="mealKcal" type="number" step="1" min="0" />
-          </div>
-          <div>
-            <label for="mealProt">Proteína (g)</label>
-            <input id="mealProt" type="number" step="0.1" min="0" />
-          </div>
-          <div>
-            <label for="mealCarb">Carbos (g)</label>
-            <input id="mealCarb" type="number" step="0.1" min="0" />
-          </div>
-          <div>
-            <label for="mealFat">Grasas (g)</label>
-            <input id="mealFat" type="number" step="0.1" min="0" />
-          </div>
-          <div class="actions">
-            <button id="btnAddMeal" class="btn btn-primary" type="button">Agregar</button>
-          </div>
-        </form>
-        <p id="msgMeals" class="muted" aria-live="polite"></p>
-      </div>
-      <div class="card table-card">
-        <table class="table" aria-label="Comidas de hoy">
-          <thead>
-            <tr><th>Comida</th><th>Kcal</th><th>P</th><th>C</th><th>G</th><th></th></tr>
-          </thead>
-          <tbody id="mealsTbody"></tbody>
-        </table>
-        <button id="btnMoreMeals" class="btn btn-soft hide" type="button">Ver más</button>
-      </div>
-    </section>
-
-    <section id="progress" class="section hide" aria-labelledby="hProgress">
-      <h2 id="hProgress">Progreso</h2>
-      <div class="card">
-        <div id="kpiCompliance" class="kpi skeleton">0%</div>
-        <div id="chartArea" class="chart-area"></div>
-        <p id="msgProgress" class="muted" aria-live="polite"></p>
-      </div>
-    </section>
   </main>
-
   <script src="/env.js"></script>
-  <script type="module" src="/app.js"></script>
+  <script type="module" src="/auth/sessionGuard.js"></script>
 </body>
 </html>
